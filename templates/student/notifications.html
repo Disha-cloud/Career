@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Notifications</h1>
+        {% if notifications.items %}
+        <button id="markAllReadBtn" class="btn btn-outline-primary">
+            Mark all as read
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="notification-page-list">
+        {% for notification in notifications.items %}
+        <div class="notification-item {{ 'unread' if not notification.read_status }}" 
+             data-notification-id="{{ notification.notification_id }}">
+            <div class="notification-icon">
+                <i class="fas {{ notification_icons[notification.notification_type] }}"></i>
+            </div>
+            <div class="notification-content">
+                <p class="mb-1">{{ notification.message }}</p>
+                <small class="text-muted">{{ notification.created_at.strftime('%B %d, %Y %I:%M %p') }}</small>
+            </div>
+            {% if not notification.read_status %}
+            <div class="notification-status">
+                <span class="badge bg-primary">New</span>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-bell fa-3x text-muted mb-3"></i>
+            <h5>No notifications</h5>
+            <p class="text-muted">You're all caught up!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if notifications.pages > 1 %}
+    <nav aria-label="Notification pages" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{ 'disabled' if not notifications.has_prev }}">
+                <a class="page-link" href="{{ url_for('student.notifications', page=notifications.prev_num) if notifications.has_prev else '#' }}">
+                    Previous
+                </a>
+            </li>
+            {% for page in notifications.iter_pages() %}
+                {% if page %}
+                    <li class="page-item {{ 'active' if page == notifications.page }}">
+                        <a class="page-link" href="{{ url_for('student.notifications', page=page) }}">{{ page }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            <li class="page-item {{ 'disabled' if not notifications.has_next }}">
+                <a class="page-link" href="{{ url_for('student.notifications', page=notifications.next_num) if notifications.has_next else '#' }}">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mark all as read button
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', function() {
+            fetch('/student/notifications/mark-all-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove all unread indicators
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                    });
+                    document.querySelectorAll('.notification-status').forEach(status => {
+                        status.remove();
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+
+    // Individual notification click
+    document.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const notificationId = this.dataset.notificationId;
+            
+            // Mark as read
+            fetch(`/student/notifications/${notificationId}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.classList.remove('unread');
+                    const status = this.querySelector('.notification-status');
+                    if (status) status.remove();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,364 @@
+/* Luxurious Pinterest-style CSS for CareerConnect */
+
+/* Global Styles & Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  :root {
+    --primary-color: #2e2a5d; /* Deep Royal Purple */
+    --secondary-color: #3f3a72; /* Rich Indigo */
+    --accent-color: #9473e6; /* Lavender Accents */
+    --background-color: #f4f4fb; /* Light Misty Background */
+    --dark-text: #1f1e2e;
+    --medium-text: #3e3b5b;
+    --light-text: #6b6b91;
+    --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.1);
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --container-width: 1200px;
+  }
+  
+  body {
+    background-color: var(--background-color);
+    color: var(--dark-text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .container {
+    width: 100%;
+    max-width: var(--container-width);
+    padding: 0 1rem;
+    margin: auto;
+  }
+  
+  /* Navbar */
+  .navbar {
+    background-color: white;
+    width: 100%;
+    max-width: var(--container-width);
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow-lg);
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1.4rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: var(--accent-color);
+  }
+  
+  /* Main Content */
+  main {
+    padding: 2rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 2rem;
+    background: var(--background-color);
+    width: 100%;
+  }
+  
+  /* Registration Form */
+  .register-container {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .register-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+  }
+
+  .subtitle {
+    color: var(--light-text);
+    font-size: 1rem;
+  }
+  
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    padding: 0.8rem;
+    border: 2px solid #e0e0f8;
+    border-radius: var(--radius-md);
+    background-color: #f8f9ff;
+    font-size: 1rem;
+    transition: border 0.3s ease;
+    width: 100%;
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+  
+  button[type="submit"] {
+    font-weight: 600;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.8rem;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: var(--accent-color);
+  }
+  
+  .login-link {
+    font-size: 0.95rem;
+    color: var(--medium-text);
+    text-decoration: none;
+  }
+
+  .login-link:hover {
+    color: var(--accent-color);
+  }
+  
+  /* Footer */
+  footer {
+    background-color: var(--primary-color);
+    padding: 2rem 0;
+    color: white;
+    text-align: center;
+    width: 100%;
+  }
+  
+  footer a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  footer a:hover {
+    color: #fff;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .register-container {
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .register-container {
+      padding: 1.5rem 1rem;
+    }
+    
+    .register-container h2 {
+      font-size: 1.5rem;
+    }
+
+    form {
+      gap: 0.8rem;
+    }
+
+    input,
+    button {
+      font-size: 0.9rem;
+      padding: 0.7rem;
+    }
+  }
+  /* Appointments Section */
+.appointments-section {
+  background-color: var(--background-color);
+  padding: 3rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.appointments-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 800px;
+  width: 100%;
+}
+
+.appointments-container h2 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.appointment-card {
+  background-color: #f8f9ff;
+  border: 2px solid #e0e0f8;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s;
+}
+
+.appointment-card:hover {
+  background-color: #e8e9ff;
+}
+
+.appointment-details {
+  flex-grow: 1;
+}
+
+.appointment-details h3 {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
+.appointment-details p {
+  font-size: 0.95rem;
+  color: var(--medium-text);
+}
+
+.cancel-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.cancel-btn:hover {
+  background-color: var(--accent-color);
+}
+/* Feedback Section */
+.feedback-section {
+  background-color: var(--background-color);
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.feedback-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.feedback-container h2 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.feedback-card {
+  background-color: #f8f9ff;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border-radius: var(--radius-md);
+  border: 2px solid #e0e0f8;
+  transition: border-color 0.3s;
+}
+
+.feedback-card:hover {
+  border-color: var(--primary-color);
+}
+
+.feedback-card p {
+  font-size: 1rem;
+  color: var(--medium-text);
+}
+
+.feedback-card .rating {
+  color: var(--accent-color);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.feedback-card .user {
+  font-size: 0.95rem;
+  color: var(--dark-text);
+  margin-top: 0.5rem;
+}
+
+.submit-feedback {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.submit-feedback:hover {
+  background-color: var(--accent-color);
+}

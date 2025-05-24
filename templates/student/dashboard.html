@@ -1,0 +1,828 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - {{ student.first_name }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/goals.css') }}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<style>
+.document-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+.document-item:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.document-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.document-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+.document-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.upload-progress {
+    display: none;
+    margin-top: 10px;
+}
+.upload-progress .progress {
+    height: 3px;
+}
+.progress-steps {
+    margin: 20px 0;
+}
+.step-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.step-item.processing {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+}
+.step-item.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+.step-item.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+.step-status {
+    display: flex;
+    align-items: center;
+}
+.step-status i {
+    margin-left: 10px;
+}
+</style>
+{% endblock %}
+
+{% block navigation %}
+<a href="{{ url_for('student.dashboard') }}" class="btn btn-active">Dashboard</a>
+<a href="{{ url_for('auth.logout') }}" class="btn">Logout</a>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header with Notifications -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Welcome, {{ student.first_name }}!</h1>
+        <!-- Notification Dropdown Component -->
+        <div class="dropdown">
+            <button class="btn btn-light position-relative" type="button" id="notificationDropdown" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span id="notificationBadge" 
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      {% if unread_notifications > 0 %}style="display: block"{% else %}style="display: none"{% endif %}>
+                    {{ unread_notifications }}
+                </span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                <div class="notification-header">
+                    <h6 class="mb-0">Notifications</h6>
+                    <button id="markAllReadBtn" class="btn btn-link btn-sm p-0" type="button">
+                        Mark all as read
+                    </button>
+                </div>
+                <div id="notificationList" class="notification-list">
+                    <!-- Notifications will be loaded here -->
+                </div>
+                <div class="notification-footer">
+                    <a href="{{ url_for('student.notifications') }}" class="text-muted">View all notifications</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Career Goals Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Career Goals</h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addGoalModal">
+                        <i class="fas fa-plus"></i> Add Goal
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Goal Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <h6>Total Goals</h6>
+                                <p id="totalGoals" class="count">{{ career_goals|length }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <h6>In Progress</h6>
+                                <p id="inProgressGoals" class="count">{{ career_goals|selectattr('status', 'equalto', 'in_progress')|list|length }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <h6>Completed</h6>
+                                <p id="completedGoals" class="count">{{ career_goals|selectattr('status', 'equalto', 'completed')|list|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Goals List Component -->
+                    <div class="goal-list">
+                        {% for goal in career_goals %}
+                        <div class="goal-item" data-goal-id="{{ goal.goal_id }}">
+                            <div class="goal-header">
+                                <h3 class="goal-title">{{ goal.title }}</h3>
+                                <span class="goal-status status-{{ goal.status }}">{{ goal.status|replace('_', ' ')|title }}</span>
+                            </div>
+                            
+                            <div class="goal-dates">
+                                {% if goal.start_date %}
+                                <span class="date-label">Start:</span> {{ goal.start_date.strftime('%B %d, %Y') }}
+                                {% endif %}
+                                {% if goal.target_date %}
+                                <span class="date-label">Target:</span> {{ goal.target_date.strftime('%B %d, %Y') }}
+                                {% endif %}
+                            </div>
+                            
+                            {% if goal.description %}
+                            <div class="goal-description">
+                                {{ goal.description }}
+                            </div>
+                            {% endif %}
+
+                            <!-- Progress Section -->
+                            <div class="goal-progress mb-3">
+                                {% set milestone_count = goal.milestones|length %}
+                                {% set completed_count = goal.milestones|selectattr('status', 'equalto', 'completed')|list|length %}
+                                {% set progress = (completed_count / milestone_count * 100) if milestone_count > 0 else 0 %}
+                                
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ progress }}%"
+                                         aria-valuenow="{{ progress }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ "%.0f"|format(progress) }}%
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    {{ completed_count }} of {{ milestone_count }} milestones completed
+                                </small>
+                            </div>
+                            
+                            <div class="goal-actions">
+                                <div class="goal-status-control">
+                                    <label for="status-{{ goal.goal_id }}">Status:</label>
+                                    <select id="status-{{ goal.goal_id }}" 
+                                            onchange="updateGoalStatus({{ goal.goal_id }}, this.value)" 
+                                            class="form-select form-select-sm">
+                                        <option value="not_started" {% if goal.status == 'not_started' %}selected{% endif %}>
+                                            Not Started
+                                        </option>
+                                        <option value="in_progress" {% if goal.status == 'in_progress' %}selected{% endif %}>
+                                            In Progress
+                                        </option>
+                                        <option value="completed" {% if goal.status == 'completed' %}selected{% endif %}>
+                                            Completed
+                                        </option>
+                                    </select>
+                                </div>
+                                <button onclick="window.location.href='{{ url_for('student.manage_milestones', goal_id=goal.goal_id) }}'" 
+                                        class="btn btn-primary btn-sm">
+                                    <i class="fas fa-tasks"></i> Manage Milestones
+                                </button>
+                                <button onclick="editGoal({{ goal.goal_id }})" class="btn btn-info btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteGoal({{ goal.goal_id }})" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <!-- Milestone Preview -->
+                            {% if goal.milestones %}
+                            <div class="milestone-preview mt-3">
+                                <h6>Recent Milestones</h6>
+                                <div class="milestone-list">
+                                    {% for milestone in goal.milestones[:3] %}
+                                    <div class="milestone-item" data-milestone-id="{{ milestone.milestone_id }}">
+                                        <div class="milestone-header">
+                                            <span class="milestone-title">{{ milestone.milestone_title }}</span>
+                                            <span class="milestone-status status-{{ milestone.status }}">
+                                                {{ milestone.status|title }}
+                                            </span>
+                                        </div>
+                                        {% if milestone.due_date %}
+                                        <div class="milestone-date">
+                                            Due: {{ milestone.due_date.strftime('%B %d, %Y') }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                    {% if goal.milestones|length > 3 %}
+                                    <div class="text-center mt-2">
+                                        <a href="{{ url_for('student.manage_milestones', goal_id=goal.goal_id) }}" 
+                                           class="text-primary">
+                                            View all {{ goal.milestones|length }} milestones
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-flag fa-3x text-muted mb-3"></i>
+                            <h5>No career goals yet</h5>
+                            <p class="text-muted">Click "Add Goal" to get started!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Upcoming Events</h5>
+                </div>
+                <div class="card-body">
+                    <div class="event-list">
+                        {% for event in upcoming_events %}
+                        <div class="event-item">
+                            <div class="event-header">
+                                <h6>{{ event.title }}</h6>
+                                <span class="badge bg-{{ event.is_online and 'info' or 'success' }}">
+                                    {{ event.is_online and 'Online' or 'In-Person' }}
+                                </span>
+                            </div>
+                            <div class="event-details">
+                                <p><i class="fas fa-calendar"></i> {{ event.event_date.strftime('%B %d, %Y') }}</p>
+                                <p><i class="fas fa-clock"></i> {{ event.start_time.strftime('%I:%M %p') }}</p>
+                                {% if not event.is_online %}
+                                <p><i class="fas fa-location-dot"></i> {{ event.location }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="event-actions">
+                                {% if event.registration %}
+                                <span class="badge bg-success">Registered</span>
+                                {% else %}
+                                <button onclick="(function() { registerForEvent({{ event.event_id }}); })()" class="btn btn-primary btn-sm">
+                                    Register
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No upcoming events</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Counsellor Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Your Counsellor</h5>
+                </div>
+                <div class="card-body">
+                    {% if student.counsellor %}
+                    <div class="counsellor-info">
+                        <h6>{{ student.counsellor.first_name }} {{ student.counsellor.last_name }}</h6>
+                        <p class="text-muted">{{ student.counsellor.specialization }}</p>
+                      
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No counsellor assigned yet</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Appointments -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Appointments</h5>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#requestAppointmentModal">
+                        Request Appointment
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Appointment Requests Section -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Pending Requests</h6>
+                        <!-- Debug info -->
+                        <div class="text-muted small mb-2">
+                            Total requests: {{ appointment_requests|length }}
+                        </div>
+                        <div class="appointment-requests-list">
+                            {% for request in appointment_requests %}
+                                {% if request.status == 'pending' %}
+                                <div class="appointment-request-item mb-3 p-3 border rounded">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6>{{ request.appointment_type }}</h6>
+                                            <p class="mb-1"><i class="fas fa-calendar"></i> {{ request.preferred_date.strftime('%B %d, %Y') }}</p>
+                                            <p class="mb-1"><i class="fas fa-clock"></i> {{ request.preferred_time.strftime('%I:%M %p') }}</p>
+                                            <p class="mb-1"><i class="fas fa-video"></i> {{ request.mode|title }}</p>
+                                            {% if request.notes %}
+                                            <p class="mb-1"><i class="fas fa-sticky-note"></i> {{ request.notes }}</p>
+                                            {% endif %}
+                                            <!-- Debug info -->
+                                            <p class="text-muted small">Status: {{ request.status }}</p>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end">
+                                            <span class="badge bg-warning mb-2">Pending</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <p class="text-muted">No appointment requests found</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Confirmed Appointments Section -->
+                    <div>
+                        <h6 class="mb-3">Upcoming Appointments</h6>
+                        <div class="appointments-list">
+                            {% for appointment in upcoming_appointments %}
+                                <div class="appointment-item mb-3 p-3 border rounded">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6>{{ appointment.appointment_type }}</h6>
+                                            <p class="mb-1"><i class="fas fa-calendar"></i> {{ appointment.appointment_date.strftime('%B %d, %Y') }}</p>
+                                            <p class="mb-1"><i class="fas fa-clock"></i> {{ appointment.start_time.strftime('%I:%M %p') }}</p>
+                                            <p class="mb-1"><i class="fas fa-video"></i> {{ appointment.mode|title }}</p>
+                                            {% if appointment.meeting_link %}
+                                            <p class="mb-1">
+                                                <i class="fas fa-link"></i>
+                                                <a href="{{ appointment.meeting_link }}" target="_blank">Join Meeting</a>
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                        <span class="badge bg-success">Confirmed</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No upcoming appointments</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Grievances -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Grievances</h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#grievanceModal">
+                        <i class="fas fa-plus"></i> New
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="grievance-list">
+                        {% for grievance in recent_grievances %}
+                        <div class="grievance-item">
+                            <div class="grievance-header">
+                                <h6>{{ grievance.subject }}</h6>
+                                <span class="badge bg-{{ grievance.status|lower }}">{{ grievance.status }}</span>
+                            </div>
+                            <small class="text-muted">{{ grievance.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No recent grievances</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Goal Modal -->
+<div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addGoalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addGoalModalLabel">Add New Career Goal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addGoalForm" method="POST" action="{{ url_for('student.manage_goals') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="goalTitle" class="form-label">Goal Title</label>
+                        <input type="text" class="form-control" id="goalTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="goalDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="goalDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate" name="start_date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="targetDate" class="form-label">Target Date</label>
+                            <input type="date" class="form-control" id="targetDate" name="target_date">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Goal Modal -->
+<div class="modal fade" id="editGoalModal" tabindex="-1" aria-labelledby="editGoalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGoalModalLabel">Edit Career Goal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editGoalForm" onsubmit="saveGoalEdit(event)">
+                <input type="hidden" id="editGoalId" name="goal_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editGoalTitle" class="form-label">Goal Title</label>
+                        <input type="text" class="form-control" id="editGoalTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editGoalDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editGoalDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editStartDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="editStartDate" name="start_date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editTargetDate" class="form-label">Target Date</label>
+                            <input type="date" class="form-control" id="editTargetDate" name="target_date">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Grievance Modal -->
+<div class="modal fade" id="grievanceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">File Grievance</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('student.submit_grievance') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="4" required></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Appointment Modal -->
+<div class="modal fade" id="requestAppointmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('student.request_appointment') }}" method="POST">
+                <div class="modal-body">
+                    <div id="appointmentForm">
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Type</label>
+                            <select name="appointment_type" class="form-select" required>
+                                <option value="Career Guidance">Career Guidance</option>
+                                <option value="Resume Review">Resume Review</option>
+                                <option value="Mock Interview">Mock Interview</option>
+                                <option value="Academic Planning">Academic Planning</option>
+                                <option value="General Discussion">General Discussion</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Preferred Date</label>
+                            <input type="date" name="appointment_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Preferred Time</label>
+                            <input type="time" name="start_time" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mode</label>
+                            <select name="mode" class="form-select" required>
+                                <option value="online">Online</option>
+                                <option value="offline">Offline</option>
+                                <option value="phone">Phone</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/goals.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadNotifications();
+    
+    // Mark all as read button
+    document.getElementById('markAllReadBtn').addEventListener('click', function() {
+        fetch('/student/notifications/mark-all-read', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('notificationBadge').style.display = 'none';
+                loadNotifications();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+
+function loadNotifications() {
+    fetch('/student/notifications')
+        .then(response => response.json())
+        .then(data => {
+            const notificationList = document.getElementById('notificationList');
+            if (data.notifications.length === 0) {
+                notificationList.innerHTML = '<div class="text-center py-3"><p class="text-muted mb-0">No notifications</p></div>';
+                return;
+            }
+
+            notificationList.innerHTML = data.notifications.map(notification => `
+                <div class="notification-item ${notification.read ? '' : 'unread'}" 
+                     onclick="handleNotificationClick(${notification.id}, '${notification.type}', ${notification.related_entity_id})">
+                    <div class="notification-icon">
+                        <i class="fas ${getNotificationIcon(notification.type)}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <p class="mb-1">${notification.message}</p>
+                        <small class="text-muted">${formatDate(notification.created_at)}</small>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update badge
+            const badge = document.getElementById('notificationBadge');
+            const unreadCount = data.notifications.filter(n => !n.read).length;
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'block' : 'none';
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function handleNotificationClick(notificationId, type, entityId) {
+    // Mark as read
+    fetch(`/student/notifications/${notificationId}/read`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadNotifications();
+            
+            // Navigate based on notification type
+            switch (type) {
+                case 'appointment':
+                    window.location.href = `/student/appointments/${entityId}`;
+                    break;
+                case 'resource':
+                    window.location.href = `/student/resources/${entityId}`;
+                    break;
+                case 'grievance':
+                    window.location.href = `/student/grievances/${entityId}`;
+                    break;
+                case 'payment':
+                    window.location.href = `/student/payments/${entityId}`;
+                    break;
+                default:
+                    // For general notifications, just mark as read
+                    break;
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function getNotificationIcon(type) {
+    const icons = {
+        'appointment': 'fa-calendar-check',
+        'resource': 'fa-book',
+        'grievance': 'fa-exclamation-circle',
+        'payment': 'fa-credit-card',
+        'general': 'fa-bell'
+    };
+    return icons[type] || icons.general;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    
+    // Less than 24 hours
+    if (diff < 24 * 60 * 60 * 1000) {
+        const hours = Math.floor(diff / (60 * 60 * 1000));
+        if (hours < 1) {
+            const minutes = Math.floor(diff / (60 * 1000));
+            return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        }
+        return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+    }
+    
+    // Less than 7 days
+    if (diff < 7 * 24 * 60 * 60 * 1000) {
+        const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+        return `${days} day${days !== 1 ? 's' : ''} ago`;
+    }
+    
+    // More than 7 days
+    return date.toLocaleDateString();
+}
+
+
+function submitAppointmentRequest(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const submitBtn = document.getElementById('submitAppointmentBtn');
+    const progressDiv = document.getElementById('appointmentProgress');
+    const formDiv = document.getElementById('appointmentForm');
+    
+    // Disable submit button and show progress
+    submitBtn.disabled = true;
+    progressDiv.style.display = 'block';
+    
+    fetch("{{ url_for('student.request_appointment') }}", {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateProgressSteps(data);
+        
+        if (data.status === 'success') {
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            submitBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('An error occurred while submitting the request.', 'error');
+        submitBtn.disabled = false;
+    });
+}
+
+function updateProgressSteps(data) {
+    const progressDiv = document.getElementById('appointmentProgress');
+    const stepsDiv = progressDiv.querySelector('.progress-steps');
+    
+    stepsDiv.innerHTML = '';
+    
+    data.steps.forEach(step => {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = `step-item ${step.status}`;
+        
+        let statusIcon = '';
+        switch(step.status) {
+            case 'processing':
+                statusIcon = '<i class="fas fa-spinner fa-spin"></i>';
+                break;
+            case 'success':
+                statusIcon = '<i class="fas fa-check text-success"></i>';
+                break;
+            case 'error':
+                statusIcon = '<i class="fas fa-times text-danger"></i>';
+                break;
+        }
+        
+        stepDiv.innerHTML = `
+            <div class="step-name">${step.step}</div>
+            <div class="step-status">
+                ${step.message || ''}
+                ${statusIcon}
+            </div>
+        `;
+        
+        stepsDiv.appendChild(stepDiv);
+    });
+}
+
+// Initialize date input with tomorrow's date
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.querySelector('input[name="appointment_date"]');
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    dateInput.min = tomorrow.toISOString().split('T')[0];
+    dateInput.value = tomorrow.toISOString().split('T')[0];
+});
+
+function cancelAppointmentRequest(requestId) {
+    if (!confirm('Are you sure you want to cancel this appointment request?')) {
+        return;
+    }
+    
+    fetch(`/student/appointment_requests/${requestId}/cancel`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('Appointment request cancelled successfully', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showToast(data.message || 'Failed to cancel appointment request', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('An error occurred while cancelling the request', 'error');
+    });
+}
+</script>
+{% endblock %} 

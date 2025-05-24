@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Milestones - {{ goal.title }}{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/goals.css') }}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('student.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('student.manage_goals') }}">Goals</a></li>
+            <li class="breadcrumb-item active">{{ goal.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Milestones for: {{ goal.title }}</h5>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#milestoneModal">
+                <i class="fas fa-plus"></i> Add Milestone
+            </button>
+        </div>
+        <div class="card-body">
+            <!-- Goal Details -->
+            <div class="goal-item mb-4">
+                <div class="goal-header">
+                    <h3 class="goal-title">{{ goal.title }}</h3>
+                    <span class="goal-status status-{{ goal.status }}">{{ goal.status|replace('_', ' ')|title }}</span>
+                </div>
+                {% if goal.description %}
+                <div class="goal-description">
+                    {{ goal.description }}
+                </div>
+                {% endif %}
+                <div class="goal-dates">
+                    {% if goal.start_date %}
+                    Start: {{ goal.start_date.strftime('%B %d, %Y') }}
+                    {% endif %}
+                    {% if goal.target_date %}
+                    | Target: {{ goal.target_date.strftime('%B %d, %Y') }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Milestones List -->
+            <div class="milestone-list">
+                {% for milestone in milestones %}
+                <div class="milestone-item" data-milestone-id="{{ milestone.milestone_id }}">
+                    <div class="milestone-header">
+                        <span class="milestone-title">{{ milestone.milestone_title }}</span>
+                        <span class="milestone-status status-{{ milestone.status }}">{{ milestone.status|title }}</span>
+                    </div>
+                    {% if milestone.due_date %}
+                    <div class="milestone-date">
+                        Due: {{ milestone.due_date.strftime('%B %d, %Y') }}
+                    </div>
+                    {% endif %}
+                    <div class="milestone-actions">
+                        <div class="milestone-status-control">
+                            <label for="status-{{ milestone.milestone_id }}">Status:</label>
+                            <select id="status-{{ milestone.milestone_id }}" 
+                                    onchange="updateMilestoneStatus({{ milestone.milestone_id }}, this.value)" 
+                                    class="form-select form-select-sm">
+                                <option value="pending" {% if milestone.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="completed" {% if milestone.status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+                        <button onclick="deleteMilestone({{ milestone.milestone_id }})" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted">No milestones yet. Click "Add Milestone" to get started!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Milestone Modal -->
+<div class="modal fade" id="milestoneModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Milestone</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="milestoneForm" data-goal-id="{{ goal.goal_id }}">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" name="milestone_title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-control" name="due_date">
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Milestone</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/milestones.js') }}"></script>
+{% endblock %} 

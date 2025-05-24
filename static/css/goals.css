@@ -1,0 +1,196 @@
+/* Goal and Milestone Styles */
+.goal-list {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.goal-item {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.goal-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.goal-title {
+    font-size: 1.5rem;
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.goal-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-not_started {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.status-in_progress {
+    background-color: #e3f2fd;
+    color: #0d6efd;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #198754;
+}
+
+.goal-dates {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.date-label {
+    font-weight: 500;
+    margin-right: 0.25rem;
+}
+
+.goal-description {
+    color: #495057;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.goal-progress {
+    margin: 1rem 0;
+}
+
+.goal-progress .progress {
+    height: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #e9ecef;
+}
+
+.goal-progress .progress-bar {
+    background-color: var(--primary-color);
+    border-radius: 0.5rem;
+}
+
+.goal-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.goal-status-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.goal-status-control select {
+    min-width: 120px;
+}
+
+.milestone-preview {
+    border-top: 1px solid #dee2e6;
+    padding-top: 1rem;
+}
+
+.milestone-list {
+    margin-top: 1rem;
+}
+
+.milestone-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.milestone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.milestone-title {
+    font-weight: 500;
+    color: #212529;
+}
+
+.milestone-date {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.milestone-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+/* Empty state styling */
+.text-center i {
+    color: #dee2e6;
+}
+
+/* Statistics Cards */
+.stats-card {
+    background: var(--background-color);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+}
+
+.stats-card h6 {
+    color: var(--medium-text);
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .count {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+/* Toast Container */
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1050;
+}
+
+.toast {
+    min-width: 250px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .goal-actions, .milestone-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+} 

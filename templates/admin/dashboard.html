@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CareerConnect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-dashboard {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .admin-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .section-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f5f5f5;
+        }
+
+        .search-bar {
+            margin-bottom: 1rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <a href="{{ url_for('admin.dashboard') }}" style="color: inherit; text-decoration: none;">CareerConnect Admin</a>
+        </div>
+        <nav>
+            <a href="{{ url_for('auth.logout') }}" class="btn">Logout</a>
+        </nav>
+    </header>
+
+    <div class="admin-dashboard">
+        <div class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <div class="admin-actions">
+                <button class="btn-action btn-primary" onclick="location.href='{{ url_for('admin.manage_users') }}'">Manage Users</button>
+            </div>
+        </div>
+
+        <div class="admin-stats">
+            <div class="stat-card">
+                <h3>Total Students</h3>
+                <p class="stat-number">{{ stats.total_students }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Counsellors</h3>
+                <p class="stat-number">{{ stats.total_counsellors }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Sessions</h3>
+                <p class="stat-number">{{ stats.active_sessions }}</p>
+            </div>
+        </div>
+
+        <div class="admin-sections">
+            <div class="section-card">
+                <h2>Student Management</h2>
+                <div class="search-bar">
+                    <input type="text" id="studentSearch" placeholder="Search students...">
+                </div>
+                <table id="studentTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Counsellor</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.first_name }} {{ student.last_name }}</td>
+                            <td>{{ student.email }}</td>
+                            <td>{{ student.counsellor.first_name if student.counsellor else 'Not Assigned' }}</td>
+                            <td>
+                                <button class="btn-action btn-secondary" onclick="reassignCounsellor({{ student.id }})">Reassign</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-card">
+                <h2>Counsellor Management</h2>
+                <div class="search-bar">
+                    <input type="text" id="counsellorSearch" placeholder="Search counsellors...">
+                </div>
+                <table id="counsellorTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Specialization</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for counsellor in counsellors %}
+                        <tr>
+                            <td>{{ counsellor.first_name }} {{ counsellor.last_name }}</td>
+                            <td>{{ counsellor.email }}</td>
+                            <td>{{ counsellor.specialization }}</td>
+                            <td>
+                                <button class="btn-action btn-secondary" onclick="manageCounsellor({{ counsellor.id }})">Manage</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Reassigning Counsellor -->
+    <div id="reassignModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Reassign Counsellor</h2>
+            <select id="counsellorSelect">
+                {% for counsellor in counsellors %}
+                <option value="{{ counsellor.id }}">{{ counsellor.first_name }} {{ counsellor.last_name }} - {{ counsellor.specialization }}</option>
+                {% endfor %}
+            </select>
+            <div class="action-buttons">
+                <button class="btn-action btn-primary" onclick="confirmReassign()">Confirm</button>
+                <button class="btn-action btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        document.getElementById('studentSearch').addEventListener('input', function(e) {
+            const searchText = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#studentTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('counsellorSearch').addEventListener('input', function(e) {
+            const searchText = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#counsellorTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+
+        // Modal functionality
+        function reassignCounsellor(studentId) {
+            document.getElementById('reassignModal').style.display = 'block';
+            window.currentStudentId = studentId;
+        }
+
+        function closeModal() {
+            document.getElementById('reassignModal').style.display = 'none';
+        }
+
+        function confirmReassign() {
+            const counsellorId = document.getElementById('counsellorSelect').value;
+            fetch(`/api/admin/reassign-counsellor`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: window.currentStudentId,
+                    counsellor_id: counsellorId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to reassign counsellor. Please try again.');
+                }
+            });
+            closeModal();
+        }
+
+        function manageCounsellor(counsellorId) {
+            window.location.href = `/admin/manage-counsellor/${counsellorId}`;
+        }
+    </script>
+</body>
+</html>
