@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS cc;
 CREATE DATABASE cc;
 USE cc;
 
--- Counsellor table with authentication
+-- Counsellors table with authentication
 CREATE TABLE counsellors (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -67,20 +67,6 @@ CREATE TABLE grievances (
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE
 );
 
--- Counsellor assignment logs
-CREATE TABLE counsellor_assignment_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT NOT NULL,
-    old_counsellor_id INT,
-    new_counsellor_id INT NOT NULL,
-    reason TEXT,
-    assigned_by_id INT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE,
-    FOREIGN KEY (old_counsellor_id) REFERENCES counsellors(id) ON DELETE SET NULL,
-    FOREIGN KEY (new_counsellor_id) REFERENCES counsellors(id) ON DELETE CASCADE,
-    FOREIGN KEY (assigned_by_id) REFERENCES administrators(id)
-);
 
 -- Appointment requests
 CREATE TABLE appointment_requests (
@@ -109,26 +95,12 @@ CREATE TABLE appointments (
     end_time TIME,
     status ENUM('scheduled', 'completed', 'cancelled', 'rescheduled') DEFAULT 'scheduled',
     mode ENUM('online', 'offline', 'phone') NOT NULL,
-    meeting_link VARCHAR(255),
     location VARCHAR(255),
-    is_free BOOLEAN DEFAULT FALSE,
-    fee DECIMAL(10,2),
-    payment_status ENUM('paid', 'pending', 'not_required') DEFAULT 'not_required',
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE,
     FOREIGN KEY (counsellor_id) REFERENCES counsellors(id) ON DELETE CASCADE
 );
 
--- Counselling sessions
-CREATE TABLE counselling_sessions (
-    session_id INT AUTO_INCREMENT PRIMARY KEY,
-    appointment_id INT,
-    notes TEXT,
-    recommendations TEXT,
-    resources TEXT,
-    follow_up_date DATE,
-    session_duration INT,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
-);
+
 
 -- Feedback
 CREATE TABLE feedback (
@@ -155,19 +127,6 @@ CREATE TABLE counsellor_schedules (
     FOREIGN KEY (counsellor_id) REFERENCES counsellors(id) ON DELETE CASCADE
 );
 
--- Career resources
-CREATE TABLE career_resources (
-    resource_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    resource_type ENUM('document', 'video', 'link', 'other') NOT NULL,
-    url VARCHAR(255),
-    file_path VARCHAR(255),
-    added_by INT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_public BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (added_by) REFERENCES administrators(id)
-);
 
 -- Notifications
 CREATE TABLE notifications (
@@ -176,7 +135,7 @@ CREATE TABLE notifications (
     message TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     read_status BOOLEAN DEFAULT FALSE,
-    notification_type ENUM('general', 'appointment', 'resource', 'payment', 'grievance') NOT NULL,
+    notification_type ENUM('general', 'appointment', 'resource', 'payment', 'grievance', 'appointment_request') NOT NULL,
     related_entity_id INT,
     FOREIGN KEY (user_id) REFERENCES student(id) ON DELETE CASCADE
 );
@@ -186,6 +145,8 @@ CREATE TABLE messages (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT,
     recipient_id INT,
+    sender_type ENUM('student', 'counsellor') NOT NULL,
+    recipient_type ENUM('student', 'counsellor') NOT NULL,
     message_text TEXT NOT NULL,
     sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN DEFAULT FALSE,
@@ -205,15 +166,6 @@ CREATE TABLE career_goals (
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE
 );
 
--- Student resource access
-CREATE TABLE student_resource_access (
-    access_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT,
-    resource_id INT,
-    access_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE,
-    FOREIGN KEY (resource_id) REFERENCES career_resources(resource_id) ON DELETE CASCADE
-);
 
 -- Goal milestones
 CREATE TABLE goal_milestones (
@@ -255,22 +207,17 @@ CREATE TABLE event_registrations (
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE
 );
 
--- Sample data: counsellors
-INSERT INTO counsellors (
-    first_name, last_name, email, password_hash, specialization, qualification,
-    years_of_experience, bio, availability_status, rating, date_registered
-) VALUES
-('John', 'Doe', 'john.doe@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Technology', 'MSc Computer Science', 10, 'Experienced technology counsellor.', TRUE, 4.5, NOW()),
-('Jane', 'Smith', 'jane.smith@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Healthcare', 'MD Medicine', 8, 'Healthcare career counsellor.', TRUE, 4.6, NOW()),
-('Michael', 'Brown', 'michael.brown@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Business', 'MBA Finance', 12, 'Business and finance counsellor.', TRUE, 4.9, NOW()),
-('Aisha', 'Patel', 'aisha.patel@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Engineering', 'BTech Mechanical Engineering', 7, 'Engineering career advisor.', TRUE, 4.7, NOW()),
-('Padmavathi', 'Devarakonda', 'padma.devarakonda@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Arts', 'MA Fine Arts', 15, 'Arts and creative careers expert.', TRUE, 4.8, NOW()),
-('Ahmed', 'Khan', 'ahmed.khan@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Science', 'PhD Physics', 11, 'Science and research specialist.', TRUE, 4.8, NOW()),
-('Rachel', 'Lee', 'rachel.lee@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Education', 'M.Ed.', 9, 'Education and teaching counsellor.', TRUE, 4.4, NOW()),
-('Bharati', 'Trivedi', 'bharati.trivedi@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Law', 'LLM Law', 20, 'Legal careers and law expert.', TRUE, 4.7, NOW());
-
--- Sample data: administrator
-INSERT INTO administrators (
-    email, password_hash, first_name, last_name, department, role_description, is_active, date_registered
-) VALUES
-('admin@example.com', 'pbkdf2:sha256:600000$abc$abc', 'Admin', 'User', 'IT', 'Superuser for the system', TRUE, NOW());
+-- Tasks
+CREATE TABLE tasks (
+    task_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    due_date DATE,
+    priority VARCHAR(20) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Pending',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES student(id)
+);

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from models import CareerCounsellor, db, CounsellorSchedule, Student, Appointment, AppointmentRequest, CounsellingSession, Administrator
+from models import CareerCounsellor, db, CounsellorSchedule, Student, Appointment, AppointmentRequest, CounsellingSession, Administrator, Notification
 from datetime import datetime, timedelta
 from functools import wraps
 from werkzeug.utils import secure_filename
@@ -87,7 +87,6 @@ def register():
         except Exception as e:
             db.session.rollback()
             flash('An error occurred during registration', 'danger')
-            print(f"Registration error: {str(e)}")  # For debugging
             return render_template('counsellor/register.html')
 
     return render_template('counsellor/register.html')
@@ -102,9 +101,9 @@ def dashboard():
     # Get statistics
     stats = {
         'total_students': len(current_user.students),
-        'today_appointments': Appointment.query.filter(
+        'upcoming_appointments': Appointment.query.filter(
             Appointment.counsellor_id == counsellor_id,
-            Appointment.appointment_date == datetime.now().date(),
+            Appointment.appointment_date >= datetime.now().date(),
             Appointment.status == 'scheduled'
         ).count(),
         'pending_requests': AppointmentRequest.query.filter_by(
@@ -116,12 +115,12 @@ def dashboard():
         ).count()
     }
     
-    # Get today's appointments
-    today_appointments = Appointment.query.filter(
+    # Get upcoming appointments
+    upcoming_appointments = Appointment.query.filter(
         Appointment.counsellor_id == counsellor_id,
-        Appointment.appointment_date == datetime.now().date(),
+        Appointment.appointment_date >= datetime.now().date(),
         Appointment.status == 'scheduled'
-    ).order_by(Appointment.start_time.asc()).all()
+    ).order_by(Appointment.appointment_date.asc(), Appointment.start_time.asc()).all()
     
     # Get pending appointment requests
     appointment_requests = AppointmentRequest.query.filter_by(
@@ -138,7 +137,7 @@ def dashboard():
     return render_template('counsellor/dashboard.html',
                          counsellor=current_user,
                          stats=stats,
-                         today_appointments=today_appointments,
+                         upcoming_appointments=upcoming_appointments,
                          appointment_requests=appointment_requests,
                          assigned_students=assigned_students,
                          schedule=schedule)
@@ -243,6 +242,43 @@ def edit_schedule():
     schedule = CounsellorSchedule.query.filter_by(counsellor_id=counsellor_id).all()
     return render_template('counsellor/schedule.html', schedule=schedule)
 
+@counsellor_bp.route('/appointments/<int:appointment_id>/complete', methods=['POST'])
+@login_required
+@counsellor_required
+def complete_appointment(appointment_id):
+    try:
+        # Get the appointment
+        appointment = Appointment.query.filter_by(
+            id=appointment_id,
+            counsellor_id=int(current_user.get_id().split('-')[1]),
+            status='scheduled'
+        ).first_or_404()
+        
+        # Update appointment status
+        appointment.status = 'completed'
+        
+        # Create counselling session record
+        session = CounsellingSession(
+            appointment_id=appointment.id,
+            session_duration=60  # Default 1 hour duration
+        )
+        db.session.add(session)
+        
+        # Create notification for student
+        notification = Notification(
+            user_id=appointment.student_id,
+            message=f'Your appointment on {appointment.appointment_date.strftime("%B %d, %Y")} at {appointment.start_time.strftime("%I:%M %p")} has been marked as completed.',
+            notification_type='appointment',
+            related_entity_id=appointment.id
+        )
+        db.session.add(notification)
+        
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+
 @counsellor_bp.route('/schedule/update', methods=['POST'])
 @login_required
 @counsellor_required
@@ -253,18 +289,23 @@ def update_schedule():
         # Delete existing schedule
         CounsellorSchedule.query.filter_by(counsellor_id=counsellor_id).delete()
         
-        # Add new schedule entries
-        for day in request.json:
-            if day['enabled']:
-                schedule = CounsellorSchedule(
-                    counsellor_id=counsellor_id,
-                    day_of_week=day['day'],
-                    start_time=datetime.strptime(day['start'], '%H:%M').time(),
-                    end_time=datetime.strptime(day['end'], '%H:%M').time()
-                )
-                db.session.add(schedule)
+        # Create new schedule entries
+        weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+        for day in weekdays:
+            start_time = datetime.strptime(request.form.get(f'{day}_start'), '%H:%M').time()
+            end_time = datetime.strptime(request.form.get(f'{day}_end'), '%H:%M').time()
+            
+            schedule = CounsellorSchedule(
+                counsellor_id=counsellor_id,
+                day_of_week=day.capitalize(),
+                start_time=start_time,
+                end_time=end_time,
+                is_recurring=True
+            )
+            db.session.add(schedule)
         
         db.session.commit()
         return jsonify({'success': True})
     except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'error': str(e)})

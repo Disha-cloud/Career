@@ -26,12 +26,13 @@ def load_user(user_id):
     if not id.isdigit():
         return None
     id = int(id)
+    
     if user_type == 'student':
-        return Student.query.get(id)
+        return db.session.get(Student, id)
     elif user_type == 'counsellor':
-        return CareerCounsellor.query.get(id)
+        return db.session.get(CareerCounsellor, id)
     elif user_type == 'admin':
-        return Administrator.query.get(id)
+        return db.session.get(Administrator, id)
     return None
 
 @app.route('/')
