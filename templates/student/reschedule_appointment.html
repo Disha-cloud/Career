@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Reschedule Appointment{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Reschedule Appointment</h5>
+                </div>
+                <div class="card-body">
+                    <div class="current-appointment mb-4">
+                        <h6>Current Appointment Details:</h6>
+                        <p><strong>Date:</strong> {{ appointment.appointment_date.strftime('%B %d, %Y') }}</p>
+                        <p><strong>Time:</strong> {{ appointment.start_time.strftime('%I:%M %p') }}</p>
+                        <p><strong>Mode:</strong> {{ appointment.mode|title }}</p>
+                    </div>
+
+                    <form action="{{ url_for('student.reschedule_appointment', appointment_id=appointment.id) }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">New Date</label>
+                            <input type="date" class="form-control" name="appointment_date" required 
+                                   min="{{ today.strftime('%Y-%m-%d') }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Time</label>
+                            <select class="form-select" name="start_time" required>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Reschedule</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

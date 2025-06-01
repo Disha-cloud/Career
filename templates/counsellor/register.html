@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Counsellor Register - CareerConnect</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .specializations-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+    .specializations-container label {
+      flex: 1 1 30%;
+      background: #f3f3f3;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .specializations-container input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .availability-container label {
+      margin-right: 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+          <a href="/" style="color: inherit; text-decoration: none;">CareerConnect</a>
+        </div>
+    <nav>
+       <a href="/" class="btn">Home</a> 
+        <a href="/login" class="btn">Login</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="register-container">
+      <h2>Register as a Counsellor</h2>
+      <form method="POST" action="{{ url_for('counsellor.register') }}" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="full_name">Full Name *</label>
+          <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" name="password" placeholder="Create a password" required />
+        </div>
+
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password *</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required />
+        </div>
+
+        <div class="form-group">
+          <label for="qualifications">Educational Qualifications *</label>
+          <input type="text" id="qualifications" name="qualifications" placeholder="Degrees, Certifications, etc." required />
+        </div>
+
+        <div class="form-group">
+          <label for="experience">Years of Experience *</label>
+          <input type="number" id="experience" name="experience" min="0" placeholder="e.g. 5" required />
+        </div>
+
+        <div class="form-group">
+          <label>Specializations *</label>
+          <div class="specializations-container">
+            <label><input type="checkbox" name="specializations" value="Career Guidance" required> Career Guidance</label>
+            <label><input type="checkbox" name="specializations" value="Mental Health"> Mental Health</label>
+            <label><input type="checkbox" name="specializations" value="Technology"> Technology</label>
+            <label><input type="checkbox" name="specializations" value="Healthcare"> Healthcare</label>
+            <label><input type="checkbox" name="specializations" value="Business"> Business</label>
+            <label><input type="checkbox" name="specializations" value="Engineering"> Engineering</label>
+            <label><input type="checkbox" name="specializations" value="Arts"> Arts</label>
+            <label><input type="checkbox" name="specializations" value="Education"> Education</label>
+            <label><input type="checkbox" name="specializations" value="Law"> Law</label>
+            <label><input type="checkbox" name="specializations" value="Finance"> Finance</label>
+            <label><input type="checkbox" name="specializations" value="Psychology"> Psychology</label>
+            <label><input type="checkbox" name="specializations" value="Human Resources"> Human Resources</label>
+          </div>
+          <small>Select one or more specializations.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="languages">Languages Spoken</label>
+          <input type="text" id="languages" name="languages" placeholder="e.g. English, Spanish, Hindi" />
+        </div>
+
+        <div class="form-group">
+          <label for="bio">Brief Bio / Introduction</label>
+          <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Availability (Select days you are available)</label>
+          <div class="availability-container">
+            <label><input type="checkbox" name="availability" value="Monday"> Monday</label>
+            <label><input type="checkbox" name="availability" value="Tuesday"> Tuesday</label>
+            <label><input type="checkbox" name="availability" value="Wednesday"> Wednesday</label>
+            <label><input type="checkbox" name="availability" value="Thursday"> Thursday</label>
+            <label><input type="checkbox" name="availability" value="Friday"> Friday</label>
+            <label><input type="checkbox" name="availability" value="Saturday"> Saturday</label>
+            <label><input type="checkbox" name="availability" value="Sunday"> Sunday</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Contact Number (optional)</label>
+          <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" />
+        </div>
+
+       
+
+        <div class="form-group">
+          <input type="checkbox" id="agree_terms" name="agree_terms" required />
+          <label for="agree_terms">I agree to the <a href="/terms" target="_blank">Terms & Conditions</a> *</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
+      </form>
+
+      <p class="register-link">
+        Already have an account? <a href="/auth/login">Sign in here</a>
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 CareerConnect. All rights reserved.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - CareerConnect</title>
+  <!-- Use Flask's url_for to link CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Login to your CareerConnect account and continue your professional journey.">
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div id="loader" class="loader-overlay" style="display: none;">
+    <div class="loader-spinner">
+      <div class="spinner"></div>
+      <p>Logging in...</p>
+    </div>
+  </div>
+
+  <header class="navbar">
+    <div class="logo">
+      <a href="/" style="color: inherit; text-decoration: none;">CareerConnect</a>
+    </div>
+    <nav>
+      <a href="/student/login" class="btn btn-active">Login</a>
+      <a href="/student/register" class="btn">Register</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="login-container">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Sign in to access your CareerConnect account</p>
+      
+      <form method="POST" action="{{ url_for('student.student_login') }}">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-options">
+          <div class="checkbox">
+            <input type="checkbox" id="remember" name="remember">
+            <label for="remember">Remember me</label>
+          </div>
+          <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+      
+      <div class="register-link">
+        Don't have an account? <a href="/student/register">Create one now</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="/about">About Us</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+        </div>
+        <p>&copy; 2025 CareerConnect. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    // Loader Display for better UX
+    function showLoader() {
+      document.getElementById('loader').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - CareerConnect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Login to your CareerConnect account and continue your professional journey.">
+</head>
+<body>
+  <div id="loader" class="loader-overlay" style="display: none;">
+    <div class="loader-spinner">
+      <div class="spinner"></div>
+      <p>Logging in...</p>
+    </div>
+  </div>
+
+  <header class="navbar">
+    <div class="logo">
+      <a href="/" style="color: inherit; text-decoration: none;">CareerConnect</a>
+    </div>
+    <nav>
+      <a href="/">Home</a>
+        
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="login-container">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Sign in to access your CareerConnect account</p>
+      
+      <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
+        <div id="errorMessage" class="error-message" style="display: none; color: #dc3545; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center;"></div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+      
+      <div class="register-link">
+        Don't have an account? 
+        <a href="{{ url_for('student.register') }}">Register as Student</a> | 
+        <a href="{{ url_for('counsellor.register') }}">Register as Counsellor</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="/about">About Us</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+        </div>
+        <p>&copy; 2025 CareerConnect. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    function showLoader() {
+      document.getElementById('loader').style.display = 'flex';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errorMessage = document.getElementById('errorMessage');
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('{{ url_for("auth.login") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password
+          })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          errorMessage.textContent = data.message || 'Invalid email or password';
+          errorMessage.style.display = 'block';
+          return;
+        }
+
+        // If login successful, redirect
+        window.location.href = data.redirect || '/';
+
+      } catch (error) {
+        errorMessage.textContent = 'An error occurred. Please try again.';
+        errorMessage.style.display = 'block';
+      }
+    });
+
+    // Clear error message when user starts typing
+    document.getElementById('email').addEventListener('input', function() {
+      document.getElementById('errorMessage').style.display = 'none';
+    });
+    document.getElementById('password').addEventListener('input', function() {
+      document.getElementById('errorMessage').style.display = 'none';
+    });
+  </script>
+</body>
+</html> 

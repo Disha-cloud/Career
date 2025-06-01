@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+  .styled-multiselect select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+  }
+  nav a {
+    text-decoration: none;
+    color: white;
+    background-color: var(--primary-color);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-md);
+    margin-left: 10px;
+    transition: background 0.3s ease;
+  }
+  nav a:hover {
+    background-color: var(--accent-color);
+  }
+</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - CareerConnect</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">CareerConnect</div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/login">Login</a>
+    </nav>
+  </header>
+  <div class="register-container">
+    <h2>Create Your Student Account</h2>
+    <p class="subtitle">Join CareerConnect and start your professional journey today</p>
+
+    <form method="POST" action="{{ url_for('student.register') }}" onsubmit="return validateForm()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+        </div>
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" name="dob" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address" placeholder="Enter your address" required>
+      </div>
+
+      <div class="form-group education-level">
+        <label for="education_level">Current Education Level</label>
+        <select id="education_level" name="education_level" required>
+          <option value="">Select your education level</option>
+          <option value="high_school">High School</option>
+          <option value="undergraduate">Undergraduate</option>
+          <option value="graduate">Graduate</option>
+          <option value="postgraduate">Postgraduate</option>
+          <option value="working_professional">Working Professional</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="interests">Career Interests <small>(Select up to 3)</small></label>
+        <div class="styled-multiselect">
+          <select id="interests" name="interests" multiple size="6" required>
+            <option value="technology">Technology</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="business">Business</option>
+            <option value="engineering">Engineering</option>
+            <option value="arts">Arts</option>
+            <option value="science">Science</option>
+            <option value="education">Education</option>
+            <option value="law">Law</option>
+          </select>
+          <small class="form-hint">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+          <small class="form-hint">Password must be at least 8 characters long</small>
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+          <small class="error-message" id="password-error" style="display: none; color: red;">
+            Passwords do not match
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group checkbox">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">
+          I agree to the
+          <a href="/terms" target="_blank">Terms of Service</a> and
+          <a href="/privacy" target="_blank">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Create Account
+      </button>
+    </form>
+
+    <div class="login-link">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>
+    </div>
+  </div>
+
+  <script>
+    // Form Validation
+    function validateForm() {
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm_password").value;
+      const passwordError = document.getElementById("password-error");
+
+      if (password !== confirmPassword) {
+        passwordError.style.display = "block";
+        return false;
+      } else {
+        passwordError.style.display = "none";
+      }
+
+      // Validate maximum 3 interests selected
+      const interests = document.getElementById("interests");
+      const selectedOptions = [...interests.options].filter(option => option.selected);
+      if (selectedOptions.length > 3) {
+        alert("Please select no more than 3 career interests");
+        return false;
+      }
+
+      return true;
+    }
+
+    // Initialize form
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set max date for date of birth (minimum age 13)
+      const today = new Date();
+      const maxDate = new Date();
+      maxDate.setFullYear(today.getFullYear() - 13);
+      document.getElementById('dob').max = maxDate.toISOString().split('T')[0];
+    });
+  </script>
+</body>
+</html>

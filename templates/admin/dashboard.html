@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CareerConnect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-dashboard {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 300px;
+            height: auto;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-card h2 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;  /* Prevent header from shrinking */
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            margin: -1rem;
+        }
+
+        .list-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0.5rem;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Empty state styling */
+        .scrollable-content p {
+            padding: 1rem;
+            margin: 0;
+            color: #666;
+            text-align: center;
+        }
+
+        .notification-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .list-item .status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .search-bar {
+            margin-bottom: 1rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification:last-child {
+            border-bottom: none;
+        }
+
+        .notification i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-time {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .notification-time i {
+            margin-right: 0.25rem;
+            color: var(--primary-color);
+        }
+
+        .view-all {
+            display: block;
+            text-align: center;
+            padding: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        /* Make cards responsive on smaller screens */
+        @media (max-width: 1200px) {
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-card {
+                min-width: unset;
+            }
+        }
+
+        /* Ensure content fills height in dashboard cards */
+        .dashboard-card > :last-child {
+            margin-top: auto;
+        }
+
+        /* Add some spacing between header and content */
+        .admin-header {
+            margin-bottom: 2rem;
+        }
+
+        /* Custom styles for the remove registration button */
+        .btn-remove-registration {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            line-height: 1;
+            border-radius: 0.2rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-remove-registration:hover {
+            background-color: #c82333;
+        }
+
+        .btn-remove-registration i {
+            font-size: 0.75rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+            max-width: 300px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 1.25rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #6c757d;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .text-success {
+            color: #28a745;
+        }
+
+        .text-danger {
+            color: #dc3545;
+        }
+
+        .student-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .student-item {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 0.75rem;
+        }
+
+        .student-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 200px;
+        }
+
+        .search-bar {
+            margin-bottom: 1rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .text-muted {
+            color: #6c757d;
+        }
+
+        .d-block {
+            display: block;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem !important;
+        }
+
+        .student-actions {
+            margin-top: 0.5rem;
+        }
+
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .d-flex {
+            display: flex !important;
+        }
+
+        .justify-content-between {
+            justify-content: space-between !important;
+        }
+
+        .align-items-center {
+            align-items: center !important;
+        }
+
+        .btn-add-event {
+            float: right;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        .btn-add-event:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .dashboard-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .reason-text {
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .mt-4 {
+            margin-top: 2rem !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+    
+    <header class="navbar">
+        <div class="logo">
+            <a href="{{ url_for('admin.dashboard') }}" style="color: inherit; text-decoration: none;">CareerConnect Admin</a>
+        </div>
+        <nav>
+            <a href="{{ url_for('auth.logout') }}" class="btn">Logout</a>
+        </nav>
+    </header>
+
+    <div class="admin-dashboard">
+        <div class="admin-header">
+            <h1>Admin Dashboard</h1>
+            
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h2><i class="fas fa-calendar"></i> Upcoming Appointments</h2>
+                <div class="scrollable-content">
+                {% if upcoming_appointments %}
+                    {% for appointment in upcoming_appointments[:3] %}
+                    <div class="list-item">
+                        <strong>{{ appointment.student.first_name }} {{ appointment.student.last_name }}</strong> with
+                        <strong>{{ appointment.counsellor.first_name }} {{ appointment.counsellor.last_name }}</strong><br>
+                        <small>{{ appointment.appointment_date.strftime('%B %d, %Y') }} at {{ appointment.start_time.strftime('%I:%M %p') }}</small>
+                        <span class="status status-{{ appointment.status }}">{{ appointment.status|title }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No upcoming appointments</p>
+                {% endif %}
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h2><i class="fas fa-clock"></i> Pending Appointment Requests</h2>
+                <div class="scrollable-content">
+                {% if pending_requests %}
+                    {% for request in pending_requests[:3] %}
+                    <div class="list-item">
+                        <strong>{{ request.student.first_name }} {{ request.student.last_name }}</strong> requested
+                        <strong>{{ request.appointment_type }}</strong> with
+                        <strong>{{ request.counsellor.first_name }} {{ request.counsellor.last_name }}</strong><br>
+                        <small>Preferred: {{ request.preferred_date.strftime('%B %d, %Y') }} at {{ request.preferred_time.strftime('%I:%M %p') }}</small>
+                        <div class="action-buttons">
+                            <form action="{{ url_for('admin.handle_appointment_request', request_id=request.id, action='approve') }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn-action btn-primary" onclick="return confirm('Are you sure you want to approve this appointment request?');">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                            </form>
+                            <form action="{{ url_for('admin.handle_appointment_request', request_id=request.id, action='reject') }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn-action btn-secondary" onclick="return confirm('Are you sure you want to reject this appointment request?');">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No pending requests</p>
+                {% endif %}
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h2><i class="fas fa-exclamation-circle"></i> Recent Grievances</h2>
+                <div class="scrollable-content">
+                {% if recent_grievances %}
+                    {% for grievance in recent_grievances[:3] %}
+                    <div class="list-item">
+                        <strong>{{ grievance.student.first_name }} {{ grievance.student.last_name }}</strong><br>
+                        <small>{{ grievance.subject }}</small>
+                        <span class="status status-{{ grievance.status|lower }}">{{ grievance.status }}</span>
+                        {% if grievance.status == 'Pending' %}
+                        <div class="action-buttons">
+                            <form action="{{ url_for('admin.update_grievance_status', grievance_id=grievance.id) }}" method="POST" style="display: inline;">
+                                <input type="hidden" name="new_status" value="In Progress">
+                                <button type="submit" class="btn-action btn-primary">
+                                    <i class="fas fa-envelope"></i> {{ grievance.student.email }}
+                                </button>
+                            </form>
+                        </div>
+                        {% elif grievance.status == 'In Progress' %}
+                        <div class="action-buttons">
+                            <form action="{{ url_for('admin.update_grievance_status', grievance_id=grievance.id) }}" method="POST" style="display: inline;">
+                                <input type="hidden" name="new_status" value="Resolved">
+                                <button type="submit" class="btn-action btn-success">
+                                    <i class="fas fa-check"></i> Complete
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No recent grievances</p>
+                {% endif %}
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>
+                    <i class="fas fa-calendar-alt"></i> Upcoming Events
+                    <button class="btn-add-event" onclick="window.location.href='{{ url_for('admin.create_event') }}'" type="button">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </h2>
+                <div class="scrollable-content">
+                {% if upcoming_events %}
+                    {% for event in upcoming_events[:3] %}
+                    <div class="list-item">
+                        <strong>{{ event.title }}</strong><br>
+                        <small>{{ event.event_date.strftime('%B %d, %Y') }} at {{ event.start_time.strftime('%I:%M %p') }}</small>
+                        <span class="status">{{ event.event_type|title }}</span>
+                        
+                        <!-- Add Delete Button -->
+                        <form action="{{ url_for('admin.delete_event', event_id=event.event_id) }}" 
+                              method="POST" 
+                              style="display: inline; float: right;"
+                              onsubmit="return confirm('Are you sure you want to delete this event? This will also remove all registrations.');">
+                            <button type="submit" class="btn-action btn-danger" title="Delete Event">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        
+                        <!-- Registered Users Section -->
+                        <div class="registered-users mt-2">
+                            <small class="text-muted">Registered Users:</small>
+                            {% if event.registrations %}
+                                {% for registration in event.registrations %}
+                                <div class="registered-user d-flex justify-content-between align-items-center" 
+                                     data-student-id="{{ registration.student_id }}"
+                                     data-event-id="{{ event.event_id }}">
+                                    <span>{{ registration.student.first_name }} {{ registration.student.last_name }}</span>
+                                    <button class="btn-remove-registration" 
+                                            onclick="removeRegistration('{{ event.event_id }}', '{{ registration.student_id }}')"
+                                            title="Remove registration">
+                                        <i class="fas fa-user-minus"></i>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-muted">No registrations yet</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No upcoming events</p>
+                {% endif %}
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h2><i class="fas fa-user-graduate"></i> Student Management</h2>
+                <div class="scrollable-content">
+                    <div class="list-item">
+                        <h3>Students Overview</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Students:</span>
+                                <span class="stat-value">{{ stats.total_students }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="list-item mt-4">
+                        <h3>Student List</h3>
+                        <div class="student-list">
+                            {% for student in all_students %}
+                            <div class="student-item d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong>{{ student.first_name }} {{ student.last_name }}</strong>
+                                    <small class="d-block text-muted">{{ student.email }}</small>
+                                    <small class="d-block">
+                                        {% if student.counsellor %}
+                                        <span class="badge badge-info">
+                                            Counsellor: {{ student.counsellor.first_name }} {{ student.counsellor.last_name }}
+                                        </span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="student-actions">
+                                    <form action="{{ url_for('admin.reassign_student_counsellor', student_id=student.id) }}" method="POST" style="display: inline;" class="reassign-counsellor-form">
+                                        <select name="new_counsellor_id" class="form-control mb-2" required>
+                                            <option value="">Assign to counsellor...</option>
+                                            {% for counsellor in active_counsellors %}
+                                                {% if not student.counsellor or counsellor.id != student.counsellor.id %}
+                                                <option value="{{ counsellor.id }}">
+                                                    {{ counsellor.first_name }} {{ counsellor.last_name }}
+                                                    ({{ counsellor.specialization or 'No specialization' }})
+                                                </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn-action btn-primary">
+                                            <i class="fas fa-user-plus"></i>
+                                            Assign
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h2><i class="fas fa-chalkboard-teacher"></i> Counsellors List</h2>
+                <div class="scrollable-content">
+                    <div class="counsellor-list">
+                        {% for counsellor in counsellors %}
+                        <div class="counsellor-item d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ counsellor.first_name }} {{ counsellor.last_name }}</strong>
+                                <small class="d-block text-muted">{{ counsellor.email }}</small>
+                                <small class="d-block">
+                                    <span class="badge badge-info">
+                                        Specialization: {{ counsellor.specialization or 'Not specified' }}
+                                    </span>
+                                    <span class="badge badge-secondary">
+                                        Students: {{ counsellor.students|length }}
+                                    </span>
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if not counsellors %}
+                            <p class="text-muted">No counsellors found</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        document.getElementById('userSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const userItems = document.querySelectorAll('.user-item');
+            
+            userItems.forEach(item => {
+                const userName = item.querySelector('.user-name').textContent.toLowerCase();
+                item.style.display = userName.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        // Remove event registration
+        async function removeRegistration(eventId, studentId) {
+            if (!confirm('Are you sure you want to remove this user from the event?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/events/${eventId}/registrations/${studentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Remove the user element from the DOM
+                    const userElement = document.querySelector(`.registered-user[data-student-id="${studentId}"][data-event-id="${eventId}"]`);
+                    if (userElement) {
+                        userElement.remove();
+                    }
+                    
+                    // Reload the page to update the registration count
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to remove registration');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to remove registration');
+            }
+        }
+
+        async function deleteStudent(studentId, studentName) {
+            if (!confirm(`Are you sure you want to delete ${studentName}? This will remove all their data and cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/students/${studentId}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to delete student');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to delete student');
+            }
+        }
+
+        function filterStudents() {
+            const input = document.getElementById('studentSearch');
+            const filter = input.value.toLowerCase();
+            const studentItems = document.querySelectorAll('.student-item');
+
+            studentItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+
+        function filterCounsellors() {
+            const input = document.getElementById('counsellorSearch');
+            const filter = input.value.toLowerCase();
+            const counsellorItems = document.querySelectorAll('.counsellor-item');
+
+            counsellorItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            const container = document.getElementById('toast-container');
+            container.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function handleAppointmentRequest(requestId, action) {
+            if (confirm(`Are you sure you want to ${action} this appointment request?`)) {
+                fetch(`/admin/appointment-requests/${requestId}/${action}`, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showToast(`Appointment request ${action}ed successfully`);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showToast(`Failed to ${action} appointment request`, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast(`Error ${action}ing appointment request`, 'danger');
+                });
+            }
+        }
+
+        // Add this new function for handling counsellor reassignment
+        document.querySelectorAll('.reassign-counsellor-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('Form submission started');
+                console.log('Form action:', this.action);
+                
+                const formData = new FormData(this);
+                console.log('Selected counsellor ID:', formData.get('new_counsellor_id'));
+                
+                if (!confirm('Are you sure you want to reassign this student to the selected counsellor?')) {
+                    return;
+                }
+
+                try {
+                    console.log('Sending fetch request...');
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    console.log('Response status:', response.status);
+                    const result = await response.text();
+                    console.log('Response text:', result);
+                    
+                    if (response.ok) {
+                        showToast('Counsellor reassigned successfully', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        console.error('Error response:', result);
+                        showToast(`Failed to reassign counsellor: ${result}`, 'danger');
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    showToast(`Failed to reassign counsellor: ${error.message}`, 'danger');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

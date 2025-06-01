@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Us - CareerConnect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    :root {
+      --primary-color: #2e2a5d;
+      --secondary-color: #3f3a72;
+      --accent-color: #9473e6;
+      --background-color: #f4f4fb;
+      --dark-text: #1f1e2e;
+      --medium-text: #3e3b5b;
+      --light-text: #6b6b91;
+      --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.1);
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --container-width: 1200px;
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: var(--dark-text);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
+    }
+
+    .navbar {
+      background-color: white;
+      width: 100%;
+      max-width: var(--container-width);
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow-lg);
+      position: fixed;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: white;
+      background-color: var(--primary-color);
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-md);
+      margin-left: 10px;
+      transition: background 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: var(--accent-color);
+    }
+
+    section {
+      width: 100%;
+      max-width: var(--container-width);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    h1, h2 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: var(--medium-text);
+      margin-bottom: 1rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero {
+      background: url('https://via.placeholder.com/1200x400') no-repeat center/cover;
+      background-color:rgb(27, 35, 81);
+      padding: 5rem 2rem;
+      border-radius: var(--radius-lg);
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      color: white;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #eee;
+    }
+
+    .icon-grid, .team-grid, .value-grid, .partner-logos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .icon-box, .team-member, .value {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .icon-box img, .team-member img, .value img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+    }
+
+    .team-member img {
+      border-radius: 50%;
+    }
+
+    .stats {
+      font-size: 1.2rem;
+      color: var(--primary-color);
+      margin-top: 1rem;
+    }
+
+    footer {
+      background-color: var(--primary-color);
+      padding: 1.5rem 0;
+      color: white;
+      text-align: center;
+      width: 100%;
+      max-width: var(--container-width);
+      margin: 0 auto;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .cta {
+      margin-top: 2rem;
+    }
+
+    .cta a {
+      display: inline-block;
+      margin: 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .btn {
+      display: inline-block;      
+      padding: 0.3rem 1.4rem;
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      max-width: 200px;             
+      white-space: nowrap;         
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-color);
+    }
+
+    .cc {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">CareerConnect</div>
+    <nav>
+      <a href="{{ url_for('main.index') }}">Home</a>
+    </nav>
+  </header>
+
+  <!-- 1. Hero Section -->
+  <section class="hero">
+    <h1>Guiding Futures, One Career at a Time</h1>
+    <p>CareerConnect bridges the gap between students and expert counsellors to empower confident career decisions.</p>
+  </section>
+
+  <!-- 2. Our Story -->
+  <section>
+    <h2>Our Story</h2>
+    <p>Founded in 2025 after our CEO struggled to find affordable career guidance, CareerConnect was born to ensure no student faces career uncertainty alone.</p>
+    <p>What began as a personal challenge transformed into a nationwide mission to make expert guidance accessible, affordable, and effective for every learner.</p>
+    <p><strong>Mission:</strong> To democratize career counselling through technology and human expertise.</p>
+    <p><strong>Vision:</strong> A world where every student discovers their potential.</p>
+  </section>
+
+  <!-- 3. How We're Different -->
+  <section>
+    <h2>How We're Different</h2>
+    <div class="icon-grid">
+      <div class="icon-box">
+        <img src="{{ url_for('static', filename='images/ai.jpg') }}" alt="AI Matching">
+        <h3>Personalized Matching</h3>
+        <p>AI-driven counsellor-student pairing based on needs, goals, and compatibility.</p>
+      </div>
+      <div class="icon-box">
+        <img src="{{ url_for('static', filename='images/qual.jpg') }}" alt="Quality Assurance">
+        <h3>Quality Assurance</h3>
+        <p>All counsellors undergo a rigorous vetting and continuous review process.</p>
+      </div>
+      <div class="icon-box">
+        <img src="{{ url_for('static', filename='images/hol.jpg') }}" alt="Holistic">
+        <h3>Holistic Approach</h3>
+        <p>We combine assessments, mentorship, and rich career resources for success.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Meet the Team -->
+  <section>
+    <h2>Meet the Team</h2>
+    <div class="team-grid">
+      <div class="team-member">
+        <h4>Disha E</h4>
+        <p>Founder & CEO – A passionate education advocate with a background in tech and psychology.</p>
+      </div>
+      <div class="team-member">
+        <h4>Dhruva</h4>
+        <p>Lead Career Counsellor – 15+ years in guidance, testing, and talent development.</p>
+      </div>
+    </div>
+    <p class="stats">500+ certified professionals across 10 fields</p>
+  </section>
+
+  <!-- 5. Impact Metrics -->
+  <section>
+    <h2>Our Impact</h2>
+    <p><strong>10,000+ students guided | 95% satisfaction rate</strong></p>
+  </section>
+
+  <!-- 6. Core Values -->
+  <section>
+    <h2>Our Values</h2>
+    <div class="value-grid">
+      <div class="value">
+        <img src="{{ url_for('static', filename='images/emp.jpg') }}" alt="Empathy">
+        <h4>Empathy</h4>
+        <p>We listen deeply to every student's unique needs.</p>
+      </div>
+      
+      <div class="value">
+        <img src="{{ url_for('static', filename='images/innovation.jpg') }}" alt="Innovation">
+        <h4>Innovation</h4>
+        <p>We leverage the best tools to redefine career counselling.</p>
+      </div>
+      
+      <div class="value">
+        <img src="{{ url_for('static', filename='images/acess.jpg') }}" alt="Accessibility">
+        <h4>Accessibility</h4>
+        <p>Affordable, available, and inclusive to all learners.</p>
+      </div>
+      
+      <div class="value">
+        <img src="{{ url_for('static', filename='images/integ.jpg') }}" alt="Integrity">
+        <h4>Integrity</h4>
+        <p>We uphold transparency and trust in every interaction.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Join our Mission</h2>
+    <section class="cc">
+      <a href="{{ url_for('counsellor.register') }}" class="btn">Become a Counsellor</a>
+    </section>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 CareerConnect. All rights reserved.</p>
+  </footer>
+</body>
+</html> 

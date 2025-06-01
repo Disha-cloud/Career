@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+{% endblock %}
+
+{% block navigation %}
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('student.dashboard') }}" class="btn btn-primary">
+    <i class="fas fa-home"></i> Dashboard
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Notifications</h2>
+    
+    {% if notifications.items %}
+        <div class="list-group">
+            {% for notification in notifications.items %}
+                <div class="list-group-item list-group-item-action {% if not notification.read_status %}list-group-item-info{% endif %}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ notification.message }}</h5>
+                        <small>{{ notification.created_at.strftime('%B %d, %Y %I:%M %p') }}</small>
+                    </div>
+                    <p class="mb-1">Type: {{ notification.notification_type }}</p>
+                    {% if not notification.read_status %}
+                        <button class="btn btn-sm btn-primary mark-read" data-notification-id="{{ notification.notification_id }}">
+                            Mark as Read
+                        </button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if notifications.pages > 1 %}
+            <nav aria-label="Notification pages" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if notifications.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('student.notifications', page=notifications.prev_num) }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    {% endif %}
+
+                    {% for page_num in notifications.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                        {% if page_num %}
+                            <li class="page-item {% if page_num == notifications.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('student.notifications', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if notifications.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('student.notifications', page=notifications.next_num) }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">No notifications found.</div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for marking notifications as read -->
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const markReadButtons = document.querySelectorAll('.mark-read');
+    
+    markReadButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const notificationId = this.dataset.notificationId;
+            
+            fetch(`/student/notifications/${notificationId}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the info background and the mark as read button
+                    const notificationItem = this.closest('.list-group-item');
+                    notificationItem.classList.remove('list-group-item-info');
+                    this.remove();
+                    
+                    // Update unread count in navbar if it exists
+                    const unreadBadge = document.querySelector('#unreadNotificationCount');
+                    if (unreadBadge) {
+                        const currentCount = parseInt(unreadBadge.textContent);
+                        if (currentCount > 0) {
+                            unreadBadge.textContent = currentCount - 1;
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error marking notification as read:', error);
+                alert('Failed to mark notification as read. Please try again.');
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

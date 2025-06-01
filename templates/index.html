@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Career Counselling Portal</title>
+  <script defer>
+    function calculateResult(event) {
+      event.preventDefault();
+      const answers = ['q1', 'q2', 'q3'].map(q => {
+        const selected = document.querySelector(`input[name="${q}"]:checked`);
+        return selected ? selected.value : null;
+      });
+
+      if (answers.includes(null)) {
+        document.getElementById('quiz-result').textContent = 'Please answer all questions.';
+        return;
+      }
+
+      const score = answers.reduce((acc, val) => {
+        acc[val] = (acc[val] || 0) + 1;
+        return acc;
+      }, {});
+
+      const bestFit = Object.entries(score).reduce((a, b) => (a[1] >= b[1] ? a : b))[0];
+
+      let suggestion = '';
+      if (bestFit === 'STEM') suggestion = 'You might be a great fit for STEM careers!';
+      else if (bestFit === 'Arts') suggestion = 'You may thrive in Creative or Arts-related careers!';
+      else if (bestFit === 'Business') suggestion = 'You may excel in Business, Management, or Entrepreneurship!';
+
+      document.getElementById('quiz-result').textContent = suggestion;
+    }
+  </script>
+</head>
+<style>
+  /* (All original styles retained) */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  :root {
+    --primary-color: #2e2a5d;
+    --secondary-color: #3f3a72;
+    --accent-color: #9473e6;
+    --background-color: #f4f4fb;
+    --dark-text: #1f1e2e;
+    --medium-text: #3e3b5b;
+    --light-text: #6b6b91;
+    --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.1);
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --container-width: 1200px;
+  }
+
+  body {
+    background:
+      linear-gradient(rgba(30, 30, 60, 0.4), rgba(30, 30, 60, 0.4)), /* semi-transparent dark overlay */
+      url('/static/images/bag.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: var(--background-color);
+    color: var(--dark-text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 80px;
+    overflow-x: hidden;
+  }
+  
+  
+  
+
+  .navbar {
+    background-color: white;
+    width: 100%;
+    max-width: var(--container-width);
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow-lg);
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  nav {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .btn {
+    padding: 0.6rem 1.4rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn:hover {
+    background-color: var(--accent-color);
+  }
+
+  .hero {
+    width: 100%;
+    max-width: var(--container-width);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 2.8rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+  }
+
+  .hero p {
+    font-size: 1.25rem;
+    margin-bottom: 25px;
+    color: var(--medium-text);
+  }
+
+  .features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 40px 2rem 60px 2rem;
+    max-width: var(--container-width);
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .feature {
+    background: white;
+    padding: 30px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    width: 260px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+  }
+
+  .feature:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .feature img {
+    width: 50px;
+    margin-bottom: 20px;
+  }
+
+  footer {
+    background-color: var(--primary-color);
+    padding: 1.5rem 0;
+    color: white;
+    text-align: center;
+    width: 100%;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .quick-assessment {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    max-width: 800px;
+    width: 90%;
+    margin: 2rem auto;
+    box-shadow: var(--shadow-lg);
+    text-align: left;
+  }
+
+  .quick-assessment h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+  }
+
+  .quick-assessment p {
+    margin: 0.5rem 0;
+  }
+
+  .quick-assessment label {
+    display: block;
+    margin-left: 1rem;
+    color: var(--medium-text);
+    margin-bottom: 0.3rem;
+  }
+
+  #quiz-result {
+    margin-top: 1.2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .features {
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .feature {
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 {
+      font-size: 2rem;
+    }
+
+    .hero p {
+      font-size: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .feature {
+      width: 100%;
+      padding: 20px;
+    }
+  }
+</style>
+<body>
+  
+  <header class="navbar">
+    <div class="logo">CareerConnect</div>
+    <nav>
+      <a href="/about" class="btn">About Us</a>
+      <a href="{{ url_for('main.events') }}" class="btn">Upcoming Events</a>
+      
+      <span class="btn" style="background-color: transparent; color: var(--primary-color); font-weight: bold; cursor: default;" >
+        📞 24/7 Support: +91-9876543210
+      </span>
+    </nav>
+  </header>
+  
+
+  <section class="hero">
+    <h1>Career Counselling Management System</h1>
+    <p>Efficiently manage students, counsellors, sessions, and career resources.</p>
+  
+ 
+    
+    
+      <a href="{{ url_for('auth.login') }}" class="btn">Login</a>
+    
+    
+  
+  <section class="hero">
+    <h2>Register NOW:</h2>
+    <div class="login-options">
+      <a href="/student/register" class="btn">Student</a>
+      <a href="/counsellor/register" class="btn">Counsellor</a>
+    </div>
+    <br>
+  <section class="testimonials">
+    <h2>What Our Users Say</h2>
+    <div class="testimonial-card">
+      <p>"CareerConnect helped me discover my true potential and find the right career path."</p>
+      <span>- Aditi Sharma, Student</span>
+    </div>
+    <div class="testimonial-card">
+      <p>"As a counsellor, this platform has streamlined my appointment management significantly."</p>
+      <span>- Dr. Raj Mehra, Career Counsellor</span>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to Take the Next Step in Your Career?</h2>
+    <p>Join CareerConnect to explore career paths, access expert counselling, and reach your goals.</p>
+  </section>
+
+  <!-- 🧠 Quick Assessment Quiz Section -->
+  <section class="quick-assessment">
+    <h2>Quick Career Fit Quiz</h2>
+    <form id="quiz-form" onsubmit="calculateResult(event)">
+      <div>
+        <p>1. Which subject do you enjoy most?</p>
+        <label><input type="radio" name="q1" value="STEM"> Math/Science</label>
+        <label><input type="radio" name="q1" value="Arts"> Literature/History</label>
+        <label><input type="radio" name="q1" value="Business"> Business/Economics</label>
+      </div>
+      <div>
+        <p>2. What activity excites you the most?</p>
+        <label><input type="radio" name="q2" value="STEM"> Solving puzzles or coding</label>
+        <label><input type="radio" name="q2" value="Arts"> Painting or writing stories</label>
+        <label><input type="radio" name="q2" value="Business"> Leading a team</label>
+      </div>
+      <div>
+        <p>3. What's your ideal work environment?</p>
+        <label><input type="radio" name="q3" value="STEM"> Labs, tech firms, or research</label>
+        <label><input type="radio" name="q3" value="Arts"> Studios or creative spaces</label>
+        <label><input type="radio" name="q3" value="Business"> Corporate or startup hubs</label>
+      </div>
+      <br>
+      <button type="submit" class="btn">Get My Career Fit</button>
+    </form>
+    <p id="quiz-result"></p>
+  </section>
+
+
+
+<br>
+  <section class="faq">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <h3>How can I book a counselling session?</h3>
+      <p>Register as a student, navigate to the dashboard, and schedule an appointment with an available counsellor.</p>
+    </div>
+    <div class="faq-item">
+      <h3>How do I become a counsellor on CareerConnect?</h3>
+      <p>Register as a counsellor, fill out your profile, and wait for approval from the admin team.</p>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature fade-in">
+      <img src="{{ url_for('static', filename='images/records.jpg') }}" alt="Student Records">
+      <h3>Manage Student Records</h3>
+      <p>Track student profiles, career interests, and uploaded documents.</p>
+    </div>
+    <div class="feature fade-in">
+      <img src="{{ url_for('static', filename='images/pic2.jpg') }}" alt="Appointments" height='60' width='150'>
+      <h3>Schedule Appointments</h3>
+      <p>Students can book counselling sessions with available counsellors.</p>
+    </div>
+    <div class="feature fade-in">
+      <img src="{{ url_for('static', filename='images/resources.jpg') }}" alt="Resources">
+      <h3>Access Career Resources</h3>
+      <p>View and manage career guidance materials and useful resources.</p>
+    </div>
+    <div class="feature fade-in">
+      <img src="{{ url_for('static', filename='images/feedback.jpg') }}" alt="Feedback">
+      <h3>Submit Feedback</h3>
+      <p>Students can rate and review their counselling experience.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 CareerConnect. All rights reserved.</p>
+  </footer>
+</body>
+</html>
