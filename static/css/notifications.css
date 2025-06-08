@@ -81,14 +81,14 @@
     text-decoration: underline;
 }
 
-/* Badge styling */
+
 .badge {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
     font-weight: 600;
 }
 
-/* List group styling for notifications page */
+
 .list-group-item {
     border-left: 3px solid transparent;
     transition: all 0.2s ease;

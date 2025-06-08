@@ -9,10 +9,10 @@ import os
 import uuid
 from functools import wraps
 
-# Create the blueprint
+
 student_bp = Blueprint('student', __name__)
 
-# Student-only decorator
+
 def student_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -26,7 +26,7 @@ def student_required(f):
 def register():
     if request.method == 'POST':
         try:
-            # Get form data
+            
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
             email = request.form.get('email')
@@ -37,7 +37,7 @@ def register():
             interests = request.form.getlist('interests')
             password = request.form.get('password')
 
-            # Validate required fields
+            
             if not all([first_name, last_name, email, password, dob_str]):
                 flash('Please fill in all required fields', 'danger')
                 return render_template('student/register.html')
@@ -48,7 +48,7 @@ def register():
                 flash('Invalid date format for date of birth', 'danger')
                 return render_template('student/register.html')
 
-            # Check if email exists in any user table
+        
             email_exists, user_type = Student.check_email_exists(email)
             if email_exists:
                 flash(f'This email is already registered as a {user_type}. Please use a different email address.', 'danger')
@@ -115,20 +115,20 @@ def assign_counsellor(student_interests):
     Returns:
         The counsellor_id of the best matching counsellor, or None if no match found
     """
-    # Get all active counsellors
+    
     available_counsellors = CareerCounsellor.query.filter_by(availability_status=True).all()
     
     if not available_counsellors:
         return None
         
-    # Convert student interests to a list and clean them
+    
     interests = [interest.strip().lower() for interest in student_interests.split(',')]
     
-    # Find best matching counsellor based on specialization
+    
     best_match_score = 0
     selected_counsellor = None
     
-    # Define specialization categories and related keywords
+   
     specialization_keywords = {
         'Technology': ['technology', 'computer', 'it', 'software', 'programming', 'tech'],
         'Healthcare': ['healthcare', 'medical', 'medicine', 'health', 'nursing'],
@@ -144,26 +144,26 @@ def assign_counsellor(student_interests):
         match_score = 0
         counsellor_specialization = counsellor.specialization.lower()
         
-        # Check each student interest against counsellor's specialization and related keywords
+        
         for interest in interests:
-            # Direct match with specialization
+            
             if interest in counsellor_specialization:
-                match_score += 2  # Give higher weight to direct matches
+                match_score += 2  
                 continue
             
-            # Check against specialization keywords
+            
             for spec, keywords in specialization_keywords.items():
                 if spec.lower() == counsellor_specialization:
                     if any(keyword in interest for keyword in keywords):
                         match_score += 1
                         break
         
-        # Update best match if this counsellor has a better score
+        
         if match_score > best_match_score:
             best_match_score = match_score
             selected_counsellor = counsellor
     
-    # If no matches found, assign the counsellor with highest rating
+    
     if not selected_counsellor and available_counsellors:
         selected_counsellor = max(available_counsellors, key=lambda c: c.rating)
     
@@ -174,10 +174,10 @@ def assign_counsellor(student_interests):
 @student_required
 def get_career_goals():
     try:
-        # Get all career goals for the current student
+        
         goals = CareerGoal.query.filter_by(student_id=current_user.id).all()
         
-        # Convert goals to dictionary format
+        
         goals_data = []
         for goal in goals:
             goal_dict = {
@@ -191,7 +191,7 @@ def get_career_goals():
                 'milestones': []
             }
             
-            # Add milestones for each goal
+            
             milestones = GoalMilestone.query.filter_by(goal_id=goal.goal_id).all()
             for milestone in milestones:
                 milestone_dict = {
@@ -227,11 +227,11 @@ def manage_goals():
         start_date_str = request.form.get('start_date')
         target_date_str = request.form.get('target_date')
         
-        # Convert date strings to date objects if provided
+        
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None
         target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date() if target_date_str else None
         
-        # Create new goal
+        
         goal = CareerGoal(
             student_id=current_user.id,
             title=title,
@@ -278,7 +278,7 @@ def manage_milestones(goal_id):
         
         return redirect(url_for('student.manage_milestones', goal_id=goal_id))
     
-    # Get unread notifications count
+    
     unread_notifications = Notification.query.filter_by(
         user_id=current_user.id,
         read_status=False
@@ -390,7 +390,7 @@ def manage_tasks():
             db.session.rollback()
             return jsonify({'error': 'Failed to add task'}), 500
     
-    # GET request - return tasks with filters
+    
     status = request.args.get('status')
     priority = request.args.get('priority')
     category = request.args.get('category')
@@ -415,7 +415,7 @@ def manage_tasks():
     
     tasks = query.all()
     
-    # Calculate statistics
+    
     total_tasks = len(tasks)
     pending_tasks = sum(1 for task in tasks if task.status == 'Pending')
     completed_tasks = sum(1 for task in tasks if task.status == 'Completed')
@@ -476,7 +476,7 @@ def handle_task(task_id):
             return jsonify({'error': 'No file provided'}), 400
         
         try:
-            # Save file to appropriate location
+            
             filename = secure_filename(file.filename)
             file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
@@ -495,7 +495,7 @@ def handle_task(task_id):
             db.session.rollback()
             return jsonify({'error': 'Failed to upload document'}), 500
     
-    # GET request - return student's documents
+    
     documents = StudentDocument.query.filter_by(student_id=current_user.id).all()
     return jsonify({
         'documents': [{
@@ -529,7 +529,7 @@ def manage_grievances():
             db.session.rollback()
             return jsonify({'error': 'Failed to submit grievance'}), 500
     
-    # GET request - return student's grievances
+    
     grievances = Grievance.query.filter_by(student_id=current_user.id).order_by(Grievance.created_at.desc()).all()
     return jsonify({
         'grievances': [{
@@ -545,12 +545,12 @@ def manage_grievances():
 @student_bp.route('/student/events', methods=['GET'])
 @login_required
 def view_events():
-    # Get upcoming events
+    
     upcoming_events = Event.query.filter(
         Event.event_date >= datetime.now().date()
     ).order_by(Event.event_date.asc()).all()
     
-    # Get student's registrations
+    
     registrations = {r.event_id: r for r in EventRegistration.query.filter_by(student_id=current_user.id).all()}
     
     return jsonify({
@@ -577,7 +577,7 @@ def register_for_event(event_id):
     if event.event_date < datetime.now().date():
         return jsonify({'error': 'Cannot register for past events'}), 400
     
-    # Check if already registered
+    
     existing_registration = EventRegistration.query.filter_by(
         event_id=event_id,
         student_id=current_user.id
@@ -586,7 +586,7 @@ def register_for_event(event_id):
     if existing_registration:
         return jsonify({'error': 'Already registered for this event'}), 400
     
-    # Check event capacity if it's set
+    
     if event.capacity is not None:
         current_registrations = EventRegistration.query.filter_by(event_id=event_id).count()
         
@@ -596,7 +596,7 @@ def register_for_event(event_id):
         pass
     
     try:
-        # Create registration
+        
         registration = EventRegistration(
             event_id=event_id,
             student_id=current_user.id,
@@ -605,7 +605,7 @@ def register_for_event(event_id):
         )
         db.session.add(registration)
         
-        # Create notification for student
+        
         notification = Notification(
             user_id=current_user.id,
             user_type='student',
@@ -647,7 +647,7 @@ def messages():
             return jsonify({'error': 'Message text is required'}), 400
         
         try:
-            # Create message to counsellor
+            
             message = Message(
                 sender_id=current_user.id,
                 recipient_id=current_user.counsellor_id,
@@ -674,13 +674,13 @@ def messages():
             db.session.rollback()
             return jsonify({'error': 'Failed to send message'}), 500
     
-    # GET request - return conversation with assigned counsellor
+    
     conversation = Message.query.filter(
         ((Message.sender_id == current_user.id) & (Message.recipient_id == current_user.counsellor_id)) |
         ((Message.sender_id == current_user.counsellor_id) & (Message.recipient_id == current_user.id))
     ).order_by(Message.sent_at.desc()).all()
     
-    # Mark received messages as read
+    
     unread_messages = [msg for msg in conversation if not msg.is_read and msg.recipient_id == current_user.id]
     for msg in unread_messages:
         msg.is_read = True
@@ -711,7 +711,7 @@ def submit_grievance():
         return redirect(url_for('student.dashboard'))
     
     try:
-        # Create new grievance
+        
         grievance = Grievance(
             student_id=current_user.id,
             subject=subject,
@@ -721,7 +721,7 @@ def submit_grievance():
         db.session.add(grievance)
         db.session.commit()
         
-        # Create notification for the student
+        
         notification = Notification(
             user_id=current_user.id,
             user_type='student',
@@ -743,7 +743,7 @@ def submit_grievance():
 @student_bp.route('/student/request_appointment', methods=['POST'])
 @login_required
 def request_appointment():
-    # Get student ID from current_user
+    
     student_id = current_user.id
     counsellor_id = current_user.counsellor_id
     
@@ -753,14 +753,14 @@ def request_appointment():
             'message': 'You need to be assigned a counsellor first.'
         }), 400
     
-    # Get form data
+    
     appointment_type = request.form.get('appointment_type')
     appointment_date = request.form.get('appointment_date')
     start_time = request.form.get('start_time')
     mode = request.form.get('mode')
     notes = request.form.get('notes')
     
-    # Validate required fields
+    
     if not all([appointment_type, appointment_date, start_time, mode]):
         return jsonify({
             'status': 'error',
@@ -768,21 +768,21 @@ def request_appointment():
         }), 400
     
     try:
-        # Convert string inputs to proper datetime objects
+        
         preferred_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
         preferred_time = datetime.strptime(start_time, '%H:%M').time()
         
-        # Calculate end time (1 hour duration)
+        
         end_time = (datetime.combine(datetime.min, preferred_time) + timedelta(hours=1)).time()
         
-        # Validate appointment date is not in the past
+        
         if preferred_date < datetime.now().date():
             return jsonify({
                 'status': 'error',
                 'message': 'Cannot schedule appointments in the past'
             }), 400
             
-        # Check counsellor's schedule for the requested day
+        
         day_of_week = preferred_date.strftime('%A')
         
         counsellor_schedule = CounsellorSchedule.query.filter_by(
@@ -796,7 +796,7 @@ def request_appointment():
                 'message': f'Counsellor is not available on {day_of_week}'
             }), 400
             
-        # Check if time is within counsellor's working hours
+        
         if (preferred_time < counsellor_schedule.start_time or 
             end_time > counsellor_schedule.end_time):
             return jsonify({
@@ -804,7 +804,7 @@ def request_appointment():
                 'message': 'Selected time is outside counsellor\'s working hours'
             }), 400
             
-        # Check for existing appointments at the same time
+        
         existing_appointment = Appointment.query.filter_by(
             counsellor_id=counsellor_id,
             appointment_date=preferred_date,
@@ -818,7 +818,7 @@ def request_appointment():
                 'message': 'This time slot is already booked. Please choose another time.'
             }), 400
         
-        # Create appointment request
+        
         appointment_request = AppointmentRequest(
             student_id=student_id,
             counsellor_id=counsellor_id,
@@ -831,9 +831,9 @@ def request_appointment():
         )
         
         db.session.add(appointment_request)
-        db.session.commit()  # Commit first to get the ID
+        db.session.commit()  
         
-        # For counsellor
+        
         counsellor_notification = Notification(
             user_id=counsellor_id,
             user_type='counsellor',
@@ -844,7 +844,7 @@ def request_appointment():
         )
         db.session.add(counsellor_notification)
         
-        # For student
+        
         student_notification = Notification(
             user_id=student_id,
             user_type='student',
@@ -892,59 +892,59 @@ def dashboard():
         flash('Unauthorized access', 'danger')
         return redirect(url_for('auth.login'))
 
-    # Get career goals for the student
+    
     career_goals = CareerGoal.query.filter_by(student_id=current_user.id).all()
     
-    # Get assigned counsellor's schedule
+    
     counsellor_schedule = None
     if current_user.counsellor_id:
         counsellor_schedule = CounsellorSchedule.query.filter_by(
             counsellor_id=current_user.counsellor_id
         ).order_by(CounsellorSchedule.day_of_week).all()
 
-    # Get upcoming appointments
+    
     upcoming_appointments = Appointment.query.filter(
         Appointment.student_id == current_user.id,
         Appointment.appointment_date >= datetime.now().date(),
         Appointment.status == 'scheduled'
     ).order_by(Appointment.appointment_date, Appointment.start_time).all()
 
-    # Get pending appointment requests
+    
     pending_requests = AppointmentRequest.query.filter_by(
         student_id=current_user.id,
         status='pending'
     ).all()
 
-    # Get recent grievances
+    
     recent_grievances = Grievance.query.filter_by(
         student_id=current_user.id
     ).order_by(Grievance.created_at.desc()).limit(5).all()
 
-    # Get upcoming events
+    
     upcoming_events = Event.query.filter(
         Event.event_date >= datetime.now().date()
     ).order_by(Event.event_date, Event.start_time).all()
 
-    # Get student's event registrations
+    
     student_registrations = EventRegistration.query.filter_by(
         student_id=current_user.id
     ).all()
     
-    # Create a dictionary of event registrations for easy lookup
+    
     event_registrations = {reg.event_id: reg for reg in student_registrations}
 
-    # Get unread notifications count
+    
     unread_notifications = Notification.query.filter_by(
         user_id=current_user.id,
         read_status=False
     ).count()
 
-    # Get recent feedback history
+    
     recent_feedback = Feedback.query.filter_by(
         student_id=current_user.id
     ).order_by(Feedback.created_at.desc()).limit(5).all()
 
-    # Get assigned tasks
+    
     assigned_tasks = Task.query.filter_by(
         student_id=current_user.id
     ).order_by(Task.due_date.asc()).all()
@@ -965,11 +965,11 @@ def dashboard():
 @student_bp.route('/student/notifications')
 @login_required
 def notifications():
-    # Get page number from request args, default to 1
-    page = request.args.get('page', 1, type=int)
-    per_page = 10  # Number of notifications per page
     
-    # Get paginated notifications for this student
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  
+    
+
     notifications = Notification.query.filter_by(
         user_id=current_user.id
     ).order_by(Notification.created_at.desc()).paginate(
@@ -978,7 +978,7 @@ def notifications():
         error_out=False
     )
     
-    # Get unread notifications count for the navbar
+    
     unread_count = Notification.query.filter_by(
         user_id=current_user.id,
         read_status=False
@@ -1016,7 +1016,7 @@ def mark_all_notifications_read():
 @student_bp.route('/student/notifications/load', methods=['GET'])
 @login_required
 def load_notifications():
-    # Get the most recent 5 notifications
+    
     notifications = Notification.query.filter_by(
         user_id=current_user.id
     ).order_by(Notification.created_at.desc()).limit(5).all()
@@ -1054,12 +1054,12 @@ def delete_document(doc_id):
     ).first_or_404()
     
     try:
-        # Delete file
+        
         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], document.file_path)
         if os.path.exists(file_path):
             os.remove(file_path)
         
-        # Delete record
+        
         db.session.delete(document)
         db.session.commit()
         
@@ -1082,19 +1082,19 @@ def reschedule_appointment(appointment_id):
         new_time = request.form.get('start_time')
         
         try:
-            # Convert string inputs to proper datetime objects
+            
             new_date = datetime.strptime(new_date, '%Y-%m-%d').date()
             new_time = datetime.strptime(new_time, '%H:%M').time()
             
-            # Validate new date is not in the past
+            
             if new_date < datetime.now().date():
                 flash('Cannot schedule appointments in the past', 'danger')
                 return redirect(url_for('student.dashboard'))
             
-            # Calculate end time (1 hour duration)
+            
             new_end_time = (datetime.combine(datetime.min, new_time) + timedelta(hours=1)).time()
             
-            # Check counselor availability
+            
             day_of_week = new_date.strftime('%A')
             counselor_schedule = CounsellorSchedule.query.filter_by(
                 counselor_id=appointment.counselor_id,
@@ -1110,7 +1110,7 @@ def reschedule_appointment(appointment_id):
                 flash('Selected time is outside counselor\'s working hours.', 'danger')
                 return redirect(url_for('student.dashboard'))
             
-            # Check for existing appointments at the new time
+            
             existing_appointment = Appointment.query.filter_by(
                 counselor_id=appointment.counselor_id,
                 appointment_date=new_date,
@@ -1122,13 +1122,13 @@ def reschedule_appointment(appointment_id):
                 flash('This time slot is already booked. Please choose another time.', 'danger')
                 return redirect(url_for('student.dashboard'))
             
-            # Update appointment
+            
             appointment.appointment_date = new_date
             appointment.start_time = new_time
             appointment.end_time = new_end_time
             appointment.status = 'rescheduled'
             
-            # Create notifications
+            
             student_notification = Notification(
                 user_id=current_user.id,
                 message=f'Your appointment has been rescheduled to {new_date.strftime("%B %d, %Y")} at {new_time.strftime("%I:%M %p")}',
@@ -1166,7 +1166,7 @@ def reschedule_appointment(appointment_id):
 @login_required
 def cancel_appointment_request(request_id):
     try:
-        # Find the appointment request
+       
         appointment_request = AppointmentRequest.query.filter_by(
             id=request_id,
             student_id=current_user.id,
@@ -1179,10 +1179,10 @@ def cancel_appointment_request(request_id):
                 'message': 'Appointment request not found or not pending'
             }), 404
         
-        # Update the request status
+        
         appointment_request.status = 'cancelled'
         
-        # Create notification for counselor
+        
         counselor_notification = Notification(
             user_id=appointment_request.counselor_id,
             user_type='counsellor',
@@ -1193,7 +1193,7 @@ def cancel_appointment_request(request_id):
         )
         db.session.add(counselor_notification)
         
-        # Create notification for student
+        
         student_notification = Notification(
             user_id=current_user.id,
             user_type='student',
@@ -1222,25 +1222,25 @@ def cancel_appointment_request(request_id):
 @login_required
 @student_required
 def check_weekly_feedback():
-    # Get the student's ID
+    
     student_id = int(current_user.get_id().split('-')[1])
     
-    # Get the last feedback submission
+    
     last_feedback = Feedback.query.filter_by(
         student_id=student_id
     ).order_by(Feedback.created_at.desc()).first()
     
-    # Check if feedback is due
+    
     feedback_due = False
     if not last_feedback:
         feedback_due = True
     else:
-        # Check if it's been a week since last feedback
+        
         week_ago = datetime.now() - timedelta(days=7)
         if last_feedback.created_at < week_ago:
             feedback_due = True
     
-    # Get the most recent feedback for display
+    
     recent_feedback = None
     if last_feedback:
         recent_feedback = {
@@ -1260,7 +1260,7 @@ def check_weekly_feedback():
 @student_required
 def submit_weekly_feedback():
     try:
-        # Get the student's ID and counsellor ID
+        
         student_id = int(current_user.get_id().split('-')[1])
         counsellor_id = current_user.counsellor_id
         
@@ -1270,7 +1270,7 @@ def submit_weekly_feedback():
                 'message': 'No counsellor assigned'
             }), 400
         
-        # Check if a feedback was already submitted in the last 7 days
+        
         last_feedback = Feedback.query.filter_by(
             student_id=student_id
         ).order_by(Feedback.created_at.desc()).first()
@@ -1284,7 +1284,7 @@ def submit_weekly_feedback():
                     'message': f'You can submit your next feedback on {next_feedback_date}'
                 }), 400
         
-        # Get form data
+        
         rating = request.form.get('rating')
         comments = request.form.get('comments')
         
@@ -1294,7 +1294,7 @@ def submit_weekly_feedback():
                 'message': 'Rating and comments are required'
             }), 400
         
-        # Create new feedback
+        
         feedback = Feedback(
             student_id=student_id,
             counsellor_id=counsellor_id,
@@ -1305,7 +1305,7 @@ def submit_weekly_feedback():
         
         db.session.add(feedback)
         
-        # Create notification for counsellor
+        
         notification = Notification(
             user_id=counsellor_id,
             user_type='counsellor',

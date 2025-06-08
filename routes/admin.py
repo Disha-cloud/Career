@@ -13,7 +13,7 @@ from flask import current_app
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-# Admin-only decorator
+
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -30,37 +30,37 @@ def dashboard():
         flash('Unauthorized access', 'danger')
         return redirect(url_for('main.index'))
 
-    # Get all counsellors
+    
     counsellors = CareerCounsellor.query.all()
     
-    # Get all students
+    
     students = Student.query.all()
     
-    # Get recent grievances
+    
     recent_grievances = Grievance.query.order_by(Grievance.created_at.desc()).limit(10).all()
     
-    # Get upcoming appointments
+    
     upcoming_appointments = Appointment.query.filter(
         Appointment.appointment_date >= datetime.now().date()
     ).order_by(Appointment.appointment_date, Appointment.start_time).all()
     
-    # Get pending appointment requests
+    
     pending_requests = AppointmentRequest.query.filter_by(status='pending').all()
     
-    # Get upcoming events with registrations and student information
+    
     upcoming_events = Event.query.filter(
         Event.event_date >= datetime.now().date()
     ).options(
         db.joinedload(Event.registrations).joinedload(EventRegistration.student)
     ).order_by(Event.event_date, Event.start_time).all()
 
-    # Calculate statistics
+    
     stats = {
         'total_students': Student.query.count(),
         'total_counsellors': CareerCounsellor.query.count()
     }
 
-    # Get lists for management sections
+    
     all_students = Student.query.all()
     active_counsellors = CareerCounsellor.query.filter_by(availability_status=True).all()
 
@@ -90,9 +90,9 @@ def manage_users():
 @admin_required
 def manage_counsellor(counsellor_id):
     counsellor = CareerCounsellor.query.get_or_404(counsellor_id)
-    # Get counsellor's students
+    
     assigned_students = Student.query.filter_by(counsellor_id=counsellor_id).all()
-    # Get counsellor's upcoming appointments
+    
     upcoming_appointments = Appointment.query.filter(
         Appointment.counsellor_id == counsellor_id,
         Appointment.appointment_date >= datetime.now().date(),
@@ -121,15 +121,14 @@ def reassign_counsellor():
         if not student or not counsellor:
             return jsonify({'success': False, 'message': 'Student or counsellor not found'}), 404
 
-        # Store old counsellor ID for notification
+        
         old_counsellor_id = student.counsellor_id
 
-        # Update student's counsellor
+        
         student.counsellor_id = counsellor_id
         db.session.commit()
 
-        # Create notifications
-        # For new counsellor
+
         new_counsellor_notification = Notification(
             user_id=counsellor_id,
             user_type='counsellor',
@@ -140,7 +139,7 @@ def reassign_counsellor():
         )
         db.session.add(new_counsellor_notification)
 
-        # For old counsellor
+        
         if old_counsellor_id:
             old_counsellor_notification = Notification(
                 user_id=old_counsellor_id,
@@ -152,7 +151,7 @@ def reassign_counsellor():
             )
             db.session.add(old_counsellor_notification)
 
-        # For student
+        
         student_notification = Notification(
             user_id=student.id,
             user_type='student',
@@ -177,7 +176,7 @@ def notifications():
     page = request.args.get('page', 1, type=int)
     per_page = 20
     
-    # Get unread notifications count
+    
     unread_notifications = Notification.query.filter_by(
         user_id=current_user.id,
         read_status=False
@@ -210,14 +209,14 @@ def mark_notifications_read():
     notification_id = request.json.get('notification_id')
     
     if notification_id:
-        # Mark specific notification as read
+        
         notification = Notification.query.filter_by(
             notification_id=notification_id,
             user_id=current_user.id
         ).first_or_404()
         notification.read_status = True
     else:
-        # Mark all notifications as read
+        
         Notification.query.filter_by(
             user_id=current_user.id,
             read_status=False
@@ -237,10 +236,10 @@ def update_grievance_status(grievance_id):
         flash('Invalid status value.', 'danger')
         return redirect(url_for('admin.dashboard'))
     
-    # Update the grievance status
+    
     grievance.status = new_status
     
-    # Create notification for student
+   
     notification = Notification(
         user_id=grievance.student_id,
         user_type='student',
@@ -266,7 +265,7 @@ def update_grievance_status(grievance_id):
 @admin_required
 def remove_event_registration(event_id, student_id):
     try:
-        # Find and delete the registration
+        
         registration = EventRegistration.query.filter_by(
             event_id=event_id,
             student_id=student_id
@@ -287,29 +286,29 @@ def delete_student(student_id):
     try:
         student = Student.query.get_or_404(student_id)
         
-        # Delete related records first
-        # Delete event registrations
+        
+        
         EventRegistration.query.filter_by(student_id=student_id).delete()
         
-        # Delete appointments
+        
         Appointment.query.filter_by(student_id=student_id).delete()
         
-        # Delete appointment requests
+        
         AppointmentRequest.query.filter_by(student_id=student_id).delete()
         
-        # Delete grievances
+        
         Grievance.query.filter_by(student_id=student_id).delete()
         
-        # Delete notifications
+        
         Notification.query.filter_by(user_id=student_id).delete()
         
-        # Delete career goals and their milestones
+        
         goals = CareerGoal.query.filter_by(student_id=student_id).all()
         for goal in goals:
             GoalMilestone.query.filter_by(goal_id=goal.goal_id).delete()
         CareerGoal.query.filter_by(student_id=student_id).delete()
         
-        # Finally, delete the student
+        
         db.session.delete(student)
         db.session.commit()
         
@@ -335,50 +334,50 @@ def toggle_student_status(student_id):
     student = Student.query.get_or_404(student_id)
     
     try:
-        # Begin transaction
+        
         db.session.begin_nested()
         
-        # Toggle student status
+        
         student.is_active = not student.is_active
         
         if not student.is_active:
-            # Delete messages
+            
             messages_deleted = Message.query.filter(
                 (Message.sender_id == student.id) | 
                 (Message.recipient_id == student.id)
             ).delete()
             
-            # Delete notifications
+            
             notifications_deleted = Notification.query.filter_by(
                 user_id=student.id
             ).delete()
             
-            # Delete feedback
+            
             feedback_deleted = Feedback.query.filter_by(
                 student_id=student.id
             ).delete()
             
-            # Delete appointment requests
+            
             requests_deleted = AppointmentRequest.query.filter_by(
                 student_id=student.id
             ).delete()
             
-            # Delete appointments
+            
             appointments_deleted = Appointment.query.filter_by(
                 student_id=student.id
             ).delete()
             
-            # Delete grievances
+            
             grievances_deleted = Grievance.query.filter_by(
                 student_id=student.id
             ).delete()
             
-            # Delete event registrations
+            
             registrations_deleted = EventRegistration.query.filter_by(
                 student_id=student.id
             ).delete()
             
-            # Delete career goals and milestones
+            
             goals_deleted = 0
             milestones_deleted = 0
             for goal in CareerGoal.query.filter_by(student_id=student.id).all():
@@ -386,7 +385,7 @@ def toggle_student_status(student_id):
                 goals_deleted += 1
             CareerGoal.query.filter_by(student_id=student.id).delete()
             
-            # Delete documents
+            
             documents_deleted = 0
             for doc in StudentDocument.query.filter_by(student_id=student.id).all():
                 try:
@@ -398,7 +397,7 @@ def toggle_student_status(student_id):
                 documents_deleted += 1
             StudentDocument.query.filter_by(student_id=student.id).delete()
             
-            # Delete resource access records
+            
             resource_access_deleted = StudentResourceAccess.query.filter_by(
                 student_id=student.id
             ).delete()
@@ -422,15 +421,15 @@ def toggle_counsellor_status(counsellor_id):
     counsellor = CareerCounsellor.query.get_or_404(counsellor_id)
     
     try:
-        # Begin transaction
+        
         db.session.begin_nested()
         
-        # Toggle counsellor status
+        
         new_status = not counsellor.availability_status
         counsellor.availability_status = new_status
         
-        if not new_status:  # Deactivating counsellor
-            # Get the replacement counsellor ID from form
+        if not new_status:  
+            
             new_counsellor_id = request.form.get('new_counsellor_id')
             
             if not new_counsellor_id:
@@ -442,13 +441,13 @@ def toggle_counsellor_status(counsellor_id):
                 flash('Invalid replacement counsellor selected', 'danger')
                 return redirect(url_for('admin.dashboard'))
             
-            # Count students before reassignment
+            
             students_count = Student.query.filter_by(counsellor_id=counsellor_id).count()
             
-            # Reassign all students to the new counsellor
+            
             update_result = Student.query.filter_by(counsellor_id=counsellor_id).update({'counsellor_id': new_counsellor_id})
             
-            # Get and reassign future appointments
+            
             future_appointments = Appointment.query.filter(
                 Appointment.counsellor_id == counsellor_id,
                 Appointment.appointment_date >= datetime.now().date(),
@@ -456,7 +455,7 @@ def toggle_counsellor_status(counsellor_id):
             ).all()
             
             for appointment in future_appointments:
-                # Create notification for student
+                
                 notification = Notification(
                     user_id=appointment.student_id,
                     message=f'Your appointment on {appointment.appointment_date} has been reassigned to {new_counsellor.first_name} {new_counsellor.last_name} due to counsellor unavailability.',
@@ -465,17 +464,17 @@ def toggle_counsellor_status(counsellor_id):
                 )
                 db.session.add(notification)
                 
-                # Update appointment
+                
                 appointment.counsellor_id = new_counsellor_id
             
-            # Reassign pending appointment requests
+            
             pending_requests_count = AppointmentRequest.query.filter_by(
                 counsellor_id=counsellor_id,
                 status='pending'
             ).update({'counsellor_id': new_counsellor_id})
             
-            # Create notifications
-            # For new counsellor
+            
+            
             new_counsellor_notification = Notification(
                 user_id=new_counsellor_id,
                 message=f'You have been assigned {students_count} students and {len(future_appointments)} appointments from {counsellor.first_name} {counsellor.last_name} who is now unavailable.',
@@ -484,7 +483,7 @@ def toggle_counsellor_status(counsellor_id):
             )
             db.session.add(new_counsellor_notification)
             
-            # For reassigned students
+            
             reassigned_students = Student.query.filter_by(counsellor_id=new_counsellor_id).all()
             for student in reassigned_students:
                 student_notification = Notification(
@@ -502,7 +501,7 @@ def toggle_counsellor_status(counsellor_id):
         else:
             flash(f'Counsellor {counsellor.first_name} {counsellor.last_name} has been activated.', 'success')
         
-        # Commit all changes
+        
         db.session.commit()
         
     except Exception as e:
@@ -522,11 +521,11 @@ def reassign_student_counsellor(student_id):
         flash('Unauthorized access', 'danger')
         return redirect(url_for('admin.dashboard'))
     
-    # Get student
+    
     student = Student.query.get_or_404(student_id)
     print(f"Found student: {student.first_name} {student.last_name}")
     
-    # Get form data
+    
     new_counsellor_id = request.form.get('new_counsellor_id')
     reason = request.form.get('reason')
     print(f"New counsellor ID: {new_counsellor_id}")
@@ -538,11 +537,11 @@ def reassign_student_counsellor(student_id):
         return redirect(url_for('admin.dashboard'))
     
     try:
-        # Begin transaction
+        
         db.session.begin_nested()
         print("Transaction started")
         
-        # Get the new counsellor
+        
         new_counsellor = CareerCounsellor.query.get(new_counsellor_id)
         if not new_counsellor or not new_counsellor.availability_status:
             print(f"Error: Invalid counsellor or counsellor not available. Counsellor found: {new_counsellor}")
@@ -551,16 +550,16 @@ def reassign_student_counsellor(student_id):
         
         print(f"Found new counsellor: {new_counsellor.first_name} {new_counsellor.last_name}")
         
-        # Store old counsellor info for reference
+        
         old_counsellor = CareerCounsellor.query.get(student.counsellor_id) if student.counsellor_id else None
         print(f"Old counsellor: {old_counsellor.first_name if old_counsellor else 'None'} {old_counsellor.last_name if old_counsellor else ''}")
         
-        # Update student's counsellor
+        
         student.counsellor_id = new_counsellor_id
         print("Updated student's counsellor ID")
         
         try:
-            # Create notification for student
+            
             student_notification = Notification(
                 user_id=student.id,
                 user_type='student',
@@ -571,7 +570,7 @@ def reassign_student_counsellor(student_id):
             db.session.add(student_notification)
             print("Added student notification")
             
-            # Create notification for new counsellor
+            
             new_counsellor_notification = Notification(
                 user_id=new_counsellor_id,
                 user_type='counsellor',
@@ -582,7 +581,7 @@ def reassign_student_counsellor(student_id):
             db.session.add(new_counsellor_notification)
             print("Added new counsellor notification")
             
-            # Create notification for old counsellor if exists
+            
             if old_counsellor:
                 old_counsellor_notification = Notification(
                     user_id=old_counsellor.id,
@@ -619,16 +618,16 @@ def delete_event(event_id):
         return redirect(url_for('admin.dashboard'))
     
     try:
-        # Begin transaction
+        
         db.session.begin_nested()
         
         event = Event.query.get_or_404(event_id)
         
         try:
-            # Get all registrations for this event
+            
             registrations = EventRegistration.query.filter_by(event_id=event_id).all()
             
-            # Create notifications for registered students
+            
             registered_students = []
             for registration in registrations:
                 notification = Notification(
@@ -641,7 +640,7 @@ def delete_event(event_id):
                 db.session.add(notification)
                 registered_students.append(registration.student_id)
             
-            # Delete all registrations
+            
             deleted_registrations = EventRegistration.query.filter_by(event_id=event_id).delete()
             
         except Exception as reg_error:
@@ -650,7 +649,7 @@ def delete_event(event_id):
             return redirect(url_for('admin.dashboard'))
         
         try:
-            # Delete the event
+            
             db.session.delete(event)
             db.session.commit()
             flash('Event deleted successfully', 'success')
@@ -671,7 +670,7 @@ def delete_event(event_id):
 def create_event():
     if request.method == 'POST':
         try:
-            # Get form data
+            
             title = request.form.get('title')
             description = request.form.get('description')
             event_date_str = request.form.get('event_date')
@@ -681,7 +680,7 @@ def create_event():
             event_type = request.form.get('event_type')
             max_participants = request.form.get('max_participants')
             
-            # Parse date and times
+            
             try:
                 event_date = datetime.strptime(event_date_str, '%Y-%m-%d').date()
                 start_time = datetime.strptime(start_time_str, '%H:%M').time()
@@ -689,7 +688,7 @@ def create_event():
             except ValueError as e:
                 raise
             
-            # Convert max_participants to int if provided
+            
             capacity = None
             if max_participants:
                 try:
@@ -697,7 +696,7 @@ def create_event():
                 except ValueError:
                     pass
             
-            # Create new event
+            
             new_event = Event(
                 title=title,
                 description=description,
@@ -708,7 +707,7 @@ def create_event():
                 location=location,
                 capacity=capacity,
                 is_online=False if location else True,
-                counsellor_id=None  # Optional: Set this if you want to assign a counsellor
+                counsellor_id=None  
             )
             
             db.session.add(new_event)
@@ -723,7 +722,7 @@ def create_event():
             flash(f'Error creating event: {str(e)}', 'danger')
             return redirect(url_for('admin.create_event'))
     
-    # GET request - render the create event form
+    
     today = datetime.now().strftime('%Y-%m-%d')
     return render_template('admin/create_event.html', today=today)
 
@@ -739,10 +738,10 @@ def handle_appointment_request(request_id, action):
         request = AppointmentRequest.query.get_or_404(request_id)
         
         if action == 'approve':
-            # Update request status
+           
             request.status = 'approved'
             
-            # Create new appointment
+            
             appointment = Appointment(
                 student_id=request.student_id,
                 counsellor_id=request.counsellor_id,
@@ -754,15 +753,15 @@ def handle_appointment_request(request_id, action):
                 status='scheduled'
             )
             
-            # Set location or meeting link based on mode
+            
             if request.mode == 'online':
-                appointment.meeting_link = 'https://meet.link/appointment'  # You can customize this
+                appointment.meeting_link = 'https://meet.link/appointment'  
             elif request.mode == 'offline':
-                appointment.location = 'Counselling Room'  # You can customize this
+                appointment.location = 'Counselling Room'  
             
             db.session.add(appointment)
             
-            # Create notification for student
+           
             student_notification = Notification(
                 user_id=request.student_id,
                 user_type='student',
@@ -772,7 +771,7 @@ def handle_appointment_request(request_id, action):
             )
             db.session.add(student_notification)
             
-            # Create notification for counsellor
+            
             counsellor_notification = Notification(
                 user_id=request.counsellor_id,
                 user_type='counsellor',
@@ -784,10 +783,10 @@ def handle_appointment_request(request_id, action):
             
             flash('Appointment request approved and scheduled', 'success')
         else:
-            # Update request status
+            
             request.status = 'rejected'
             
-            # Create rejection notification for student
+            
             student_notification = Notification(
                 user_id=request.student_id,
                 user_type='student',
@@ -799,7 +798,7 @@ def handle_appointment_request(request_id, action):
             
             flash('Appointment request rejected', 'info')
         
-        # Delete the request after updating status
+        
         db.session.commit()
         db.session.delete(request)
         db.session.commit()

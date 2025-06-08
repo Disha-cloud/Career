@@ -9,11 +9,11 @@ def check_new_messages(partner_type, partner_id):
     try:
         after_id = request.args.get('after', 0, type=int)
         
-        # Get the current user's type and ID
+        
         user_type = 'student' if isinstance(current_user, Student) else 'counsellor'
         user_id = int(current_user.get_id().split('-')[1])
         
-        # Query for new messages
+        
         new_messages = Message.query.filter(
             Message.id > after_id,
             ((Message.sender_type == partner_type) & (Message.sender_id == partner_id) &
@@ -36,13 +36,13 @@ def check_new_messages(partner_type, partner_id):
 @login_required
 def check_all_new_messages():
     try:
-        # Get the last message timestamp for the current user
+        
         last_message = Message.query.filter(
             (Message.sender_id == current_user.id) | 
             (Message.recipient_id == current_user.id)
         ).order_by(Message.timestamp.desc()).first()
         
-        # Get unread messages count
+        
         unread_count = Message.query.filter_by(
             recipient_id=current_user.id,
             read_status=False

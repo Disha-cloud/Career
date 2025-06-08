@@ -8,20 +8,20 @@ messages_bp = Blueprint('messages', __name__)
 @messages_bp.route('/api/messages/conversation/<recipient_type>/<int:recipient_id>', methods=['GET'])
 @login_required
 def get_conversation(recipient_type, recipient_id):
-    # Determine sender type based on current user
+    
     sender_type = 'student' if current_user.get_id().startswith('student-') else 'counsellor'
     sender_id = int(current_user.get_id().split('-')[1])
     
-    # Verify the relationship between student and counsellor
+    
     if sender_type == 'student':
         if not current_user.counsellor_id or current_user.counsellor_id != recipient_id:
             return jsonify({'error': 'You can only message your assigned counsellor'}), 403
-    else:  # sender is counsellor
+    else: 
         student = Student.query.get(recipient_id)
         if not student or student.counsellor_id != sender_id:
             return jsonify({'error': 'You can only message your assigned students'}), 403
     
-    # Get messages between the two users
+    
     messages = Message.query.filter(
         (
             (Message.sender_id == sender_id) & 
@@ -37,7 +37,7 @@ def get_conversation(recipient_type, recipient_id):
         )
     ).order_by(Message.sent_at.asc()).all()
     
-    # Mark unread messages as read
+    
     unread_messages = [m for m in messages if not m.is_read and m.recipient_id == sender_id]
     for message in unread_messages:
         message.is_read = True
@@ -51,26 +51,26 @@ def get_conversation(recipient_type, recipient_id):
 def send_message():
     data = request.get_json()
     
-    # Determine sender type based on current user
+    
     sender_type = 'student' if current_user.get_id().startswith('student-') else 'counsellor'
     sender_id = int(current_user.get_id().split('-')[1])
     recipient_id = data.get('recipient_id')
     recipient_type = data.get('recipient_type')
     
-    # Prevent users from messaging themselves
+    
     if sender_id == recipient_id and sender_type == recipient_type:
         return jsonify({'error': 'You cannot send messages to yourself'}), 400
     
-    # Verify the relationship between student and counsellor
+    
     if sender_type == 'student':
         if not current_user.counsellor_id or current_user.counsellor_id != recipient_id:
             return jsonify({'error': 'You can only message your assigned counsellor'}), 403
-    else:  # sender is counsellor
+    else:  
         student = Student.query.get(recipient_id)
         if not student or student.counsellor_id != sender_id:
             return jsonify({'error': 'You can only message your assigned students'}), 403
     
-    # Create new message
+    
     message = Message(
         sender_id=sender_id,
         sender_type=sender_type,
@@ -89,12 +89,12 @@ def send_message():
 @messages_bp.route('/api/messages/conversations', methods=['GET'])
 @login_required
 def get_conversations():
-    # Determine user type based on current user
+    
     user_type = 'student' if current_user.get_id().startswith('student-') else 'counsellor'
     user_id = int(current_user.get_id().split('-')[1])
     
     if user_type == 'student':
-        # Students can only see conversations with their assigned counsellor
+        
         if not current_user.counsellor_id:
             return jsonify([])
             
@@ -113,7 +113,7 @@ def get_conversations():
             )
         ).order_by(Message.sent_at.desc()).all()
     else:
-        # Counsellors can only see conversations with their assigned students
+        
         assigned_students = Student.query.filter_by(counsellor_id=user_id).with_entities(Student.id).all()
         student_ids = [s.id for s in assigned_students]
         
@@ -135,18 +135,18 @@ def get_conversations():
             )
         ).order_by(Message.sent_at.desc()).all()
     
-    # Get unique conversation partners
+    
     conversations = {}
     for message in messages:
         if message.sender_id == user_id:
-            # Only show recipients of the opposite type
+            
             if (user_type == 'student' and message.recipient_type != 'counsellor') or \
                (user_type == 'counsellor' and message.recipient_type != 'student'):
                 continue
             partner_id = message.recipient_id
             partner_type = message.recipient_type
         else:
-            # Only show senders of the opposite type
+            
             if (user_type == 'student' and message.sender_type != 'counsellor') or \
                (user_type == 'counsellor' and message.sender_type != 'student'):
                 continue
@@ -154,7 +154,7 @@ def get_conversations():
             partner_type = message.sender_type
             
         if (partner_type, partner_id) not in conversations:
-            # Get partner details
+            
             if partner_type == 'student':
                 partner = Student.query.get(partner_id)
                 if partner:

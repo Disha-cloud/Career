@@ -100,7 +100,7 @@
           return;
         }
 
-        // If login successful, redirect
+        
         window.location.href = data.redirect || '/';
 
       } catch (error) {
@@ -109,7 +109,7 @@
       }
     });
 
-    // Clear error message when user starts typing
+    
     document.getElementById('email').addEventListener('input', function() {
       document.getElementById('errorMessage').style.display = 'none';
     });

@@ -31,7 +31,7 @@ def registration_success():
 def register():
     if request.method == 'POST':
         try:
-            # Get form data
+            
             full_name = request.form.get('full_name', '').split()
             first_name = full_name[0] if full_name else ''
             last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
@@ -43,16 +43,16 @@ def register():
             phone = request.form.get('phone')
             languages = request.form.get('languages')
             
-            # Get specializations
+            
             specializations = request.form.getlist('specializations')
             specialization = ', '.join(specializations)
 
-            # Check if email already exists
+            
             if CareerCounsellor.query.filter_by(email=email).first():
                 flash('Email already registered', 'danger')
                 return render_template('counsellor/register.html')
 
-            # Create new counsellor
+            
             counsellor = CareerCounsellor(
                 email=email,
                 first_name=first_name,
@@ -66,11 +66,11 @@ def register():
             )
             counsellor.set_password(password)
 
-            # Add to database
+            
             db.session.add(counsellor)
             db.session.commit()
 
-            # Handle availability schedule
+            
             availability = request.form.getlist('availability')
             for day in availability:
                 schedule = CounsellorSchedule(
@@ -97,10 +97,10 @@ def register():
 @login_required
 @counsellor_required
 def dashboard():
-    # Get counsellor's ID from current_user
+    
     counsellor_id = int(current_user.get_id().split('-')[1])
     
-    # Get statistics
+    
     stats = {
         'total_students': Student.query.filter_by(counsellor_id=counsellor_id).count(),
         'upcoming_appointments': Appointment.query.filter(
@@ -114,36 +114,36 @@ def dashboard():
         ).count()
     }
     
-    # Get upcoming appointments
+    
     upcoming_appointments = Appointment.query.filter(
         Appointment.counsellor_id == counsellor_id,
         Appointment.appointment_date >= datetime.now().date(),
         Appointment.status == 'scheduled'
     ).order_by(Appointment.appointment_date, Appointment.start_time).all()
     
-    # Get pending appointment requests
+    
     appointment_requests = AppointmentRequest.query.filter_by(
         counsellor_id=counsellor_id,
         status='pending'
     ).order_by(AppointmentRequest.preferred_date).all()
     
-    # Get assigned students
+    
     assigned_students = Student.query.filter_by(
         counsellor_id=counsellor_id,
         is_active=True
     ).all()
     
-    # Get counsellor's schedule
+    
     schedule = CounsellorSchedule.query.filter_by(
         counsellor_id=counsellor_id
     ).order_by(CounsellorSchedule.day_of_week).all()
     
-    # Get assigned tasks
+    
     assigned_tasks = Task.query.join(Student).filter(
         Student.counsellor_id == counsellor_id
     ).order_by(Task.due_date.asc()).all()
     
-    # Get unread notifications count
+
     unread_notifications = Notification.query.filter_by(
         user_id=counsellor_id,
         read_status=False
@@ -165,10 +165,10 @@ def dashboard():
 def schedule_appointment():
     print("\n=== Starting Appointment Scheduling ===")
     try:
-        # Debug: Print all form data
+        
         print("Form data received:", request.form)
         
-        # Get form data
+        
         student_id = request.form.get('student_id')
         appointment_type = request.form.get('appointment_type')
         date = request.form.get('date')
@@ -185,7 +185,7 @@ def schedule_appointment():
             'location': location
         })
 
-        # Validate required fields
+    
         required_fields = {'student_id': student_id, 
                          'appointment_type': appointment_type, 
                          'date': date, 
@@ -200,7 +200,7 @@ def schedule_appointment():
                 'message': f'Missing required fields: {", ".join(missing_fields)}'
             }), 400
 
-        # Convert string inputs to proper datetime objects
+        
         try:
             print(f"Converting date '{date}' and time '{time}' to datetime objects")
             appointment_date = datetime.strptime(date, '%Y-%m-%d').date()
@@ -213,7 +213,7 @@ def schedule_appointment():
                 'message': 'Invalid date or time format'
             }), 400
 
-        # Validate date is not in the past
+        
         if appointment_date < datetime.now().date():
             print(f"Past date validation failed: {appointment_date} < {datetime.now().date()}")
             return jsonify({
@@ -221,11 +221,11 @@ def schedule_appointment():
                 'message': 'Cannot schedule appointments in the past'
             }), 400
 
-        # Calculate end time (1 hour duration)
+        
         end_time = (datetime.combine(datetime.min, start_time) + timedelta(hours=1)).time()
         print(f"Calculated end time: {end_time}")
 
-        # Check counsellor's schedule for the requested day
+        
         day_of_week = appointment_date.strftime('%A')
         print(f"Checking schedule for {day_of_week}")
         
@@ -246,7 +246,7 @@ def schedule_appointment():
             'end_time': counsellor_schedule.end_time
         })
 
-        # Check if time is within working hours
+        
         if (start_time < counsellor_schedule.start_time or 
             end_time > counsellor_schedule.end_time):
             print(f"Time validation failed: start={start_time}, end={end_time}")
@@ -256,7 +256,7 @@ def schedule_appointment():
                 'message': 'Selected time is outside your working hours'
             }), 400
 
-        # Check for existing appointments
+        
         print("Checking for existing appointments")
         existing_appointment = Appointment.query.filter_by(
             counsellor_id=current_user.id,
@@ -273,7 +273,7 @@ def schedule_appointment():
             }), 400
 
         print("Creating new appointment")
-        # Create appointment
+        
         appointment = Appointment(
             student_id=student_id,
             counsellor_id=current_user.id,
@@ -288,7 +288,7 @@ def schedule_appointment():
         db.session.add(appointment)
 
         print("Creating notification")
-        # Create notification for student
+        
         notification = Notification(
             user_id=student_id,
             user_type='student',
@@ -326,10 +326,10 @@ def schedule_appointment():
 @counsellor_required
 def approve_request(request_id):
     try:
-        # Get counsellor ID from current_user
+        
         counsellor_id = int(current_user.get_id().split('-')[1])
         
-        # First check if request exists at all
+        
         request = AppointmentRequest.query.get(request_id)
         if not request:
             print(f"Request {request_id} not found")
@@ -338,7 +338,7 @@ def approve_request(request_id):
                 'message': 'Appointment request not found'
             }), 404
             
-        # Then check if it belongs to this counsellor
+        
         if request.counsellor_id != counsellor_id:
             print(f"Request {request_id} belongs to counsellor {request.counsellor_id}, not {counsellor_id}")
             return jsonify({
@@ -346,7 +346,7 @@ def approve_request(request_id):
                 'message': 'This request is not assigned to you'
             }), 403
             
-        # Finally check if it's still pending
+        
         if request.status != 'pending':
             print(f"Request {request_id} is not pending (status: {request.status})")
             return jsonify({
@@ -357,10 +357,10 @@ def approve_request(request_id):
         print(f"Processing approval for request {request_id}")
         print(f"Request details: date={request.preferred_date}, time={request.preferred_time}, student={request.student_id}")
         
-        # Calculate end time (1 hour duration)
+        
         end_time = (datetime.combine(datetime.min, request.preferred_time) + timedelta(hours=1)).time()
         
-        # Create appointment
+        
         appointment = Appointment(
             student_id=request.student_id,
             counsellor_id=counsellor_id,
@@ -372,7 +372,7 @@ def approve_request(request_id):
             status='scheduled'
         )
         
-        # Set location or meeting link based on mode
+        
         if request.mode == 'online':
             appointment.meeting_link = 'https://meet.google.com/' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
         elif request.mode == 'offline':
@@ -380,11 +380,11 @@ def approve_request(request_id):
             
         db.session.add(appointment)
         
-        # Update request status
+        
         request.status = 'approved'
         request.updated_at = datetime.now()
         
-        # Create notification for student
+        
         notification = Notification(
             user_id=request.student_id,
             user_type='student',
@@ -394,7 +394,7 @@ def approve_request(request_id):
         )
         db.session.add(notification)
         
-        # Create notification for counsellor
+        
         counsellor_notification = Notification(
             user_id=counsellor_id,
             user_type='counsellor',
@@ -404,7 +404,7 @@ def approve_request(request_id):
         )
         db.session.add(counsellor_notification)
         
-        # Commit all changes
+        
         db.session.commit()
         print(f"Successfully approved request {request_id} and created appointment")
         
@@ -428,17 +428,17 @@ def approve_request(request_id):
 @counsellor_required
 def reject_request(request_id):
     try:
-        # Find the appointment request
+        
         request = AppointmentRequest.query.filter_by(
             id=request_id,
             counsellor_id=current_user.id,
             status='pending'
         ).first_or_404()
         
-        # Update request status
+        
         request.status = 'rejected'
         
-        # Create notification for student
+        
         notification = Notification(
             user_id=request.student_id,
             message=f'Your appointment request for {request.preferred_date.strftime("%B %d, %Y")} at {request.preferred_time.strftime("%I:%M %p")} has been rejected.',
@@ -484,17 +484,17 @@ def edit_schedule():
 @counsellor_required
 def complete_appointment(appointment_id):
     try:
-        # Get the appointment
+        
         appointment = Appointment.query.filter_by(
             id=appointment_id,
             counsellor_id=int(current_user.get_id().split('-')[1]),
             status='scheduled'
         ).first_or_404()
         
-        # Update appointment status
+        
         appointment.status = 'completed'
         
-        # Create notification for student
+        
         notification = Notification(
             user_id=appointment.student_id,
             user_type='student',
@@ -517,7 +517,7 @@ def complete_appointment(appointment_id):
 def update_schedule():
     try:
         data = request.get_json()
-        print(f"Received schedule update data: {data}")  # Debug log
+        print(f"Received schedule update data: {data}")  
         
         if not isinstance(data, dict):
             return jsonify({
@@ -534,31 +534,29 @@ def update_schedule():
         counsellor_id = int(current_user.get_id().split('-')[1])
         schedules_updated = 0
         
-        # Start transaction
+        
         db.session.begin_nested()
         
-        # Get the days that are included in the request
+        
         days_in_request = set()
         for key in data.keys():
             if '_start' in key:
                 days_in_request.add(key.replace('_start', ''))
         
-        print(f"Days included in request: {days_in_request}")  # Debug log
-        
-        # Process only the days included in the request
+        print(f"Days included in request: {days_in_request}")  
         for day in days_in_request:
             start_key = f'{day}_start'
             end_key = f'{day}_end'
             
-            # If either time is empty for a day, remove that day's schedule
+            
             if not data.get(start_key) or not data.get(end_key):
-                # Remove schedule for this day if it exists
+                
                 deleted = CounsellorSchedule.query.filter_by(
                     counsellor_id=counsellor_id,
                     day_of_week=day.capitalize()
                 ).delete()
                 if deleted:
-                    print(f"Removed schedule for {day}")  # Debug log
+                    print(f"Removed schedule for {day}")  
                     schedules_updated += 1
                 continue
                 
@@ -566,23 +564,23 @@ def update_schedule():
                 start_time = datetime.strptime(data[start_key], '%H:%M').time()
                 end_time = datetime.strptime(data[end_key], '%H:%M').time()
                 
-                # Validate times
+                
                 if start_time >= end_time:
                     raise ValueError(f'End time must be after start time for {day}')
                 
-                # Find existing schedule for this day
+                
                 schedule = CounsellorSchedule.query.filter_by(
                     counsellor_id=counsellor_id,
                     day_of_week=day.capitalize()
                 ).first()
                 
                 if schedule:
-                    # Update existing schedule
+                    
                     schedule.start_time = start_time
                     schedule.end_time = end_time
-                    print(f"Updated schedule for {day}: {start_time} - {end_time}")  # Debug log
+                    print(f"Updated schedule for {day}: {start_time} - {end_time}")  
                 else:
-                    # Create new schedule
+                    
                     schedule = CounsellorSchedule(
                         counsellor_id=counsellor_id,
                         day_of_week=day.capitalize(),
@@ -591,13 +589,13 @@ def update_schedule():
                         is_recurring=True
                     )
                     db.session.add(schedule)
-                    print(f"Created new schedule for {day}: {start_time} - {end_time}")  # Debug log
+                    print(f"Created new schedule for {day}: {start_time} - {end_time}")  
                 
                 schedules_updated += 1
                 
             except ValueError as e:
                 db.session.rollback()
-                print(f"Error updating schedule for {day}: {str(e)}")  # Debug log
+                print(f"Error updating schedule for {day}: {str(e)}")  
                 return jsonify({
                     'status': 'error',
                     'message': f'Invalid time format for {day}: {str(e)}'
@@ -610,9 +608,9 @@ def update_schedule():
                 'message': 'No valid schedule days provided'
             }), 400
         
-        # Commit all changes
+        
         db.session.commit()
-        print(f"Successfully updated {schedules_updated} schedule entries")  # Debug log
+        print(f"Successfully updated {schedules_updated} schedule entries")  
         
         return jsonify({
             'status': 'success',
@@ -621,7 +619,7 @@ def update_schedule():
         
     except Exception as e:
         db.session.rollback()
-        print(f"Error in update_schedule: {str(e)}")  # Debug log
+        print(f"Error in update_schedule: {str(e)}")  
         return jsonify({
             'status': 'error',
             'message': 'Failed to update schedule'
@@ -634,13 +632,13 @@ def load_notifications():
     try:
         counsellor_id = int(current_user.get_id().split('-')[1])
         
-        # Get notifications for this counsellor
+        
         notifications = Notification.query.filter_by(
             user_id=counsellor_id,
             user_type='counsellor'
         ).order_by(Notification.created_at.desc()).limit(10).all()
         
-        # Format notifications
+        
         formatted_notifications = [{
             'id': n.notification_id,
             'message': n.message,
@@ -662,7 +660,7 @@ def mark_notification_read(notification_id):
     try:
         counsellor_id = int(current_user.get_id().split('-')[1])
         
-        # Get and update notification
+        
         notification = Notification.query.filter_by(
             notification_id=notification_id,
             user_id=counsellor_id,
@@ -685,7 +683,7 @@ def mark_all_notifications_read():
     try:
         counsellor_id = int(current_user.get_id().split('-')[1])
         
-        # Update all unread notifications
+        
         Notification.query.filter_by(
             user_id=counsellor_id,
             user_type='counsellor',
@@ -705,9 +703,9 @@ def mark_all_notifications_read():
 @counsellor_required
 def assign_task():
     try:
-        print("Starting task assignment...")  # Debug print
+        print("Starting task assignment...")  
         
-        # Get form data
+       
         student_id = request.form.get('student_id')
         title = request.form.get('title')
         description = request.form.get('description')
@@ -715,9 +713,9 @@ def assign_task():
         priority = request.form.get('priority')
         category = request.form.get('category')
 
-        print(f"Received form data: student_id={student_id}, title={title}, due_date={due_date}, priority={priority}, category={category}")  # Debug print
+        print(f"Received form data: student_id={student_id}, title={title}, due_date={due_date}, priority={priority}, category={category}")  
 
-        # Validate required fields
+        
         if not all([student_id, title, due_date, priority, category]):
             missing_fields = [field for field, value in {
                 'student_id': student_id,
@@ -726,24 +724,24 @@ def assign_task():
                 'priority': priority,
                 'category': category
             }.items() if not value]
-            print(f"Missing required fields: {missing_fields}")  # Debug print
+            print(f"Missing required fields: {missing_fields}")  
             return jsonify({
                 'success': False,
                 'message': f'Missing required fields: {", ".join(missing_fields)}'
             }), 400
 
         try:
-            # Convert due_date string to date object
+            
             due_date = datetime.strptime(due_date, '%Y-%m-%d').date()
-            print(f"Converted due_date: {due_date}")  # Debug print
+            print(f"Converted due_date: {due_date}")  
         except ValueError as e:
-            print(f"Error parsing due_date: {str(e)}")  # Debug print
+            print(f"Error parsing due_date: {str(e)}")  
             return jsonify({
                 'success': False,
                 'message': 'Invalid date format. Please use YYYY-MM-DD'
             }), 400
 
-        # Create new task
+        
         task = Task(
             student_id=student_id,
             title=title,
@@ -754,13 +752,13 @@ def assign_task():
             status='Pending'
         )
 
-        print("Created task object")  # Debug print
+        print("Created task object")  
 
-        # Add task to database
+        
         db.session.add(task)
-        print("Added task to session")  # Debug print
+        print("Added task to session")  
 
-        # Create notification for student
+       
         notification = Notification(
             user_id=student_id,
             user_type='student',
@@ -769,11 +767,11 @@ def assign_task():
             related_entity_id=task.task_id
         )
         db.session.add(notification)
-        print("Added notification to session")  # Debug print
+        print("Added notification to session") 
 
-        # Commit changes
+        
         db.session.commit()
-        print("Committed changes to database")  # Debug print
+        print("Committed changes to database")  
 
         return jsonify({
             'success': True,
@@ -782,10 +780,10 @@ def assign_task():
 
     except Exception as e:
         db.session.rollback()
-        print(f"Error assigning task: {str(e)}")  # Debug print
-        print(f"Error type: {type(e)}")  # Debug print
+        print(f"Error assigning task: {str(e)}")  
+        print(f"Error type: {type(e)}")  
         import traceback
-        print(f"Traceback: {traceback.format_exc()}")  # Debug print
+        print(f"Traceback: {traceback.format_exc()}")  
         return jsonify({
             'success': False,
             'message': 'Failed to assign task'
@@ -796,14 +794,14 @@ def assign_task():
 @counsellor_required
 def delete_task(task_id):
     try:
-        # Get task and verify it belongs to a student assigned to this counsellor
+        
         counsellor_id = int(current_user.get_id().split('-')[1])
         task = Task.query.join(Student).filter(
             Task.task_id == task_id,
             Student.counsellor_id == counsellor_id
         ).first_or_404()
         
-        # Create notification for student
+        
         notification = Notification(
             user_id=task.student_id,
             user_type='student',
@@ -813,7 +811,7 @@ def delete_task(task_id):
         )
         db.session.add(notification)
         
-        # Delete task
+        
         db.session.delete(task)
         db.session.commit()
         

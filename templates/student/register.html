@@ -134,7 +134,7 @@
   </div>
 
   <script>
-    // Form Validation
+    
     function validateForm() {
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirm_password").value;
@@ -147,7 +147,7 @@
         passwordError.style.display = "none";
       }
 
-      // Validate maximum 3 interests selected
+      
       const interests = document.getElementById("interests");
       const selectedOptions = [...interests.options].filter(option => option.selected);
       if (selectedOptions.length > 3) {
@@ -158,9 +158,9 @@
       return true;
     }
 
-    // Initialize form
+    
     document.addEventListener('DOMContentLoaded', function() {
-      // Set max date for date of birth (minimum age 13)
+      
       const today = new Date();
       const maxDate = new Date();
       maxDate.setFullYear(today.getFullYear() - 13);

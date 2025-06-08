@@ -16,10 +16,10 @@
 
 {% block content %}
 <div class="container py-4">
-    <!-- Header with Notifications -->
+   
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Manage Milestones</h1>
-        <!-- Notification Dropdown Component -->
+        
         <div class="dropdown">
             <button class="btn btn-light position-relative" type="button" id="notificationDropdown" 
                     data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,7 +38,7 @@
                     </button>
                 </div>
                 <div id="notificationList" class="notification-list">
-                    <!-- Notifications will be loaded here -->
+                    
                 </div>
                 <div class="notification-footer">
                     <a href="{{ url_for('student.notifications') }}" class="text-muted">View all notifications</a>
@@ -56,7 +56,7 @@
             </button>
         </div>
         <div class="card-body">
-            <!-- Goal Details -->
+            
             <div class="goal-item mb-4">
                 <div class="goal-header">
                     <h3 class="goal-title">{{ goal.title }}</h3>
@@ -77,7 +77,7 @@
                 </div>
             </div>
 
-            <!-- Milestones List -->
+            
             <div class="milestone-list">
                 {% for milestone in milestones %}
                 <div class="milestone-item" data-milestone-id="{{ milestone.milestone_id }}">
@@ -115,7 +115,7 @@
     </div>
 </div>
 
-<!-- Add Milestone Modal -->
+
 <div class="modal fade" id="milestoneModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -143,7 +143,7 @@
     </div>
 </div>
 
-<!-- Toast Container -->
+
 <div id="toastContainer" class="toast-container"></div>
 {% endblock %}
 
@@ -154,7 +154,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     loadNotifications();
     
-    // Mark all as read button
+    
     document.getElementById('markAllReadBtn').addEventListener('click', function() {
         fetch('/student/notifications/mark-all-read', {
             method: 'POST',
@@ -196,7 +196,7 @@ function loadNotifications() {
                 </div>
             `).join('');
 
-            // Update badge
+            
             const badge = document.getElementById('notificationBadge');
             const unreadCount = data.notifications.filter(n => !n.read).length;
             badge.textContent = unreadCount;
@@ -206,7 +206,7 @@ function loadNotifications() {
 }
 
 function handleNotificationClick(notificationId, type, entityId) {
-    // Mark as read
+   
     fetch(`/student/notifications/${notificationId}/read`, {
         method: 'POST',
         headers: {
@@ -218,7 +218,7 @@ function handleNotificationClick(notificationId, type, entityId) {
         if (data.success) {
             loadNotifications();
             
-            // Navigate based on notification type
+            
             switch (type) {
                 case 'appointment':
                     window.location.href = `/student/appointments/${entityId}`;
@@ -233,7 +233,7 @@ function handleNotificationClick(notificationId, type, entityId) {
                     window.location.href = `/student/payments/${entityId}`;
                     break;
                 default:
-                    // For general notifications, just mark as read
+                    
                     break;
             }
         }

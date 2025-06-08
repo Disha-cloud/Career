@@ -155,7 +155,7 @@
         margin: 0;
     }
     
-    /* Message styling with increased specificity */
+    
     .chat-messages .message {
         max-width: 70%;
         margin-bottom: 10px;
@@ -204,7 +204,7 @@
         margin: 0;
     }
     
-    /* Override any potential conflicting styles */
+    
     .chat-messages .message.sent * {
         color: white !important;
     }
@@ -222,10 +222,10 @@
 
 {% block content %}
 <div class="dashboard-container">
-    <!-- Header with Notifications -->
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Welcome, {{ counsellor.first_name }}!</h1>
-        <!-- Notification Dropdown Component -->
+       
         <div class="dropdown">
             <button class="btn btn-light position-relative" type="button" id="notificationDropdown" 
                     data-bs-toggle="dropdown" aria-expanded="false">
@@ -242,13 +242,13 @@
                     <button id="markAllReadBtn" class="btn btn-link btn-sm p-0">Mark all as read</button>
                 </div>
                 <div id="notificationList" class="notification-list">
-                    <!-- Notifications will be loaded here -->
+                    
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Statistics -->
+   
     <div class="stats-row">
         <div class="stat-card">
             <h3>Total Students</h3>
@@ -265,9 +265,9 @@
     </div>
 
     <div class="main-content">
-        <!-- Left Column -->
+        
         <div class="left-column">
-            <!-- Task Assignment Card -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Student Tasks</h5>
@@ -312,7 +312,7 @@
                 </div>
             </div>
 
-            <!-- Upcoming Appointments -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Upcoming Appointments</h5>
@@ -347,7 +347,7 @@
                 </div>
             </div>
 
-            <!-- Appointment Requests -->
+            
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Pending Appointment Requests</h5>
@@ -381,7 +381,7 @@
                 </div>
             </div>
 
-            <!-- Messages -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Messages</h5>
@@ -392,7 +392,7 @@
                 <div class="card-body">
                     <div class="messages-container">
                         <div class="conversations-list">
-                            <!-- Conversations will be loaded here -->
+                            
                         </div>
                         <div class="chat-window" style="display: none;">
                             <div class="chat-header">
@@ -402,7 +402,7 @@
                                 <span class="chat-partner-name"></span>
                             </div>
                             <div class="chat-messages">
-                                <!-- Messages will be loaded here -->
+                               
                             </div>
                             <div class="chat-input">
                                 <form id="message-form" class="d-flex">
@@ -418,9 +418,9 @@
             </div>
         </div>
 
-        <!-- Right Column -->
+        
         <div class="right-column">
-            <!-- My Students -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">My Students</h5>
@@ -451,7 +451,7 @@
                 </div>
             </div>
 
-            <!-- Schedule -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">My Schedule</h5>
@@ -476,7 +476,7 @@
     </div>
 </div>
 
-<!-- Schedule Modal -->
+
 <div class="modal fade" id="scheduleModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -534,7 +534,7 @@
     </div>
 </div>
 
-<!-- Edit Schedule Modal -->
+
 <div class="modal fade" id="editScheduleModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -585,7 +585,7 @@
     </div>
 </div>
 
-<!-- New Message Modal -->
+
 <div class="modal fade" id="newMessageModal" tabindex="-1" aria-labelledby="newMessageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -618,7 +618,7 @@
     </div>
 </div>
 
-<!-- Add Task Assignment Modal -->
+
 <div class="modal fade" id="assignTaskModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -676,25 +676,25 @@
     </div>
 </div>
 
-<!-- Toast Container -->
+
 <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
 <script>
-// Add event listener to start time input
+
 document.querySelector('input[name="time"]').addEventListener('change', function() {
     const startTime = this.value;
     if (startTime) {
-        // Parse the start time and add 1 hour
+        
         const [hours, minutes] = startTime.split(':');
         const date = new Date();
         date.setHours(parseInt(hours));
         date.setMinutes(parseInt(minutes));
         date.setHours(date.getHours() + 1);
         
-        // Format the end time
+        
         const endHours = String(date.getHours()).padStart(2, '0');
         const endMinutes = String(date.getMinutes()).padStart(2, '0');
         document.querySelector('input[name="end_time"]').value = `${endHours}:${endMinutes}`;
@@ -788,13 +788,13 @@ function submitSchedule() {
     const form = document.getElementById('scheduleForm');
     const formData = new FormData(form);
     
-    // Debug: Log all form data
+   
     console.log('Form data contents:');
     for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
     }
 
-    // Add error handling for required fields
+    
     const requiredFields = ['student_id', 'appointment_type', 'date', 'time', 'mode'];
     for (const field of requiredFields) {
         if (!formData.get(field)) {
@@ -804,7 +804,7 @@ function submitSchedule() {
         }
     }
 
-    // Debug: Log date validation
+    
     const selectedDate = new Date(formData.get('date'));
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -820,7 +820,7 @@ function submitSchedule() {
         return;
     }
 
-    // Get the form's action URL from the form element
+    
     const url = form.getAttribute('action');
     console.log('Submitting to URL:', url);
 
@@ -842,15 +842,15 @@ function submitSchedule() {
         if (data.success) {
             console.log('Appointment scheduled successfully');
             showToast('Appointment scheduled successfully', 'success');
-            // Close modal
+            
             const modal = document.getElementById('scheduleModal');
             const modalInstance = bootstrap.Modal.getInstance(modal);
             if (modalInstance) {
                 modalInstance.hide();
             }
-            // Reset form
+            
             form.reset();
-            // Reload page after a short delay
+           
             setTimeout(() => window.location.reload(), 1000);
         } else {
             console.error('Server returned error:', data.message);
@@ -864,7 +864,7 @@ function submitSchedule() {
     });
 }
 
-// Add date input validation with debugging
+
 document.querySelector('input[name="date"]').addEventListener('change', function() {
     console.log('Date input changed:', this.value);
     const selectedDate = new Date(this.value);
@@ -913,9 +913,9 @@ function saveSchedule() {
     let hasActiveDay = false;
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
     
-    // Process form data and add logging
+    
     days.forEach(day => {
-        // Check if the checkbox exists
+        
         const checkbox = document.getElementById(`${day}_active`);
         if (!checkbox) {
             console.error(`Checkbox for ${day} not found`);
@@ -927,7 +927,7 @@ function saveSchedule() {
             const endInput = document.querySelector(`input[name="${day}_end"]`);
             
             if (startInput && endInput && startInput.value && endInput.value) {
-                // Ensure time is in HH:MM format
+                
                 const formatTime = (timeStr) => {
                     const [hours, minutes] = timeStr.split(':');
                     return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
@@ -941,7 +941,7 @@ function saveSchedule() {
                 console.warn(`Missing time for ${day}: start=${startInput?.value}, end=${endInput?.value}`);
             }
         } else {
-            // Explicitly set empty values for unchecked days to signal removal
+            
             data[`${day}_start`] = '';
             data[`${day}_end`] = '';
             console.log(`Removing schedule for ${day}`);
@@ -973,12 +973,12 @@ function saveSchedule() {
         console.log('Server response:', data);
         if (data.status === 'success') {
             showToast(data.message || 'Schedule updated successfully', 'success');
-            // Close the modal
+            
             const modal = bootstrap.Modal.getInstance(document.getElementById('editScheduleModal'));
             if (modal) {
                 modal.hide();
             }
-            // Reload the page after a short delay
+            
             setTimeout(() => location.reload(), 1000);
         } else {
             throw new Error(data.message || 'Failed to update schedule');
@@ -1034,7 +1034,7 @@ function loadConversations() {
                 </div>
             `).join('');
 
-            // Add click handlers
+            
             document.querySelectorAll('.conversation-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const id = item.dataset.id;
@@ -1075,7 +1075,7 @@ function loadMessages(partnerId, partnerType) {
             chatMessages.innerHTML = '';
             
             messages.forEach(msg => {
-                // A message is sent by me (counselor) if sender_type is counsellor and sender_id is 1
+                
                 const isSentByMe = msg.sender_type === 'counsellor' && msg.sender_id === 1;
                 
                 const messageElement = document.createElement('div');
@@ -1101,7 +1101,7 @@ function loadMessages(partnerId, partnerType) {
         });
 }
 
-// Update the message sending code
+
 document.getElementById('message-form').addEventListener('submit', (e) => {
     e.preventDefault();
     if (!currentConversation) return;
@@ -1161,8 +1161,7 @@ document.getElementById('message-form').addEventListener('submit', (e) => {
     });
 });
 
-// Remove the checkNewMessages function since the endpoint doesn't exist
-// Instead, periodically reload the full conversation
+
 setInterval(() => {
     if (currentConversation) {
         loadMessages(currentConversation.id, currentConversation.type);
@@ -1176,7 +1175,7 @@ document.querySelector('.back-to-conversations').addEventListener('click', () =>
     loadConversations();
 });
 
-// New message functionality
+
 document.getElementById('send-new-message').addEventListener('click', function() {
     var studentId = document.getElementById('student-select').value;
     var messageText = document.getElementById('new-message-text').value.trim();
@@ -1227,7 +1226,7 @@ document.getElementById('send-new-message').addEventListener('click', function()
 document.addEventListener('DOMContentLoaded', function() {
     loadNotifications();
     
-    // Mark all as read button
+    
     document.getElementById('markAllReadBtn').addEventListener('click', function() {
         fetch('/counsellor/notifications/mark-all-read', {
             method: 'POST',
@@ -1269,7 +1268,7 @@ function loadNotifications() {
                 </div>
             `).join('');
 
-            // Update badge
+            
             const badge = document.getElementById('notificationBadge');
             const unreadCount = data.notifications.filter(n => !n.read).length;
             badge.textContent = unreadCount;
@@ -1279,7 +1278,7 @@ function loadNotifications() {
 }
 
 function handleNotificationClick(notificationId, type, entityId) {
-    // Mark as read
+    
     fetch(`/counsellor/notifications/${notificationId}/read`, {
         method: 'POST',
         headers: {
@@ -1291,7 +1290,7 @@ function handleNotificationClick(notificationId, type, entityId) {
         if (data.success) {
             loadNotifications();
             
-            // Navigate based on notification type
+            
             switch (type) {
                 case 'appointment':
                     window.location.href = `/counsellor/appointments/${entityId}`;
@@ -1303,7 +1302,7 @@ function handleNotificationClick(notificationId, type, entityId) {
                     window.location.href = `/counsellor/grievances/${entityId}`;
                     break;
                 default:
-                    // For general notifications, just mark as read
+                    
                     break;
             }
         }
@@ -1326,7 +1325,7 @@ function formatDate(dateString) {
     const now = new Date();
     const diff = now - date;
     
-    // Less than 24 hours
+    
     if (diff < 24 * 60 * 60 * 1000) {
         const hours = Math.floor(diff / (60 * 60 * 1000));
         if (hours < 1) {
@@ -1336,13 +1335,13 @@ function formatDate(dateString) {
         return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
     }
     
-    // Less than 7 days
+    
     if (diff < 7 * 24 * 60 * 60 * 1000) {
         const days = Math.floor(diff / (24 * 60 * 60 * 1000));
         return `${days} day${days !== 1 ? 's' : ''} ago`;
     }
     
-    // More than 7 days
+    
     return date.toLocaleDateString();
 }
 
@@ -1357,15 +1356,15 @@ function assignTask() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show success message
+            
             showToast('Success', data.message, 'success');
-            // Close modal
+           
             const modal = document.getElementById('assignTaskModal');
             const modalInstance = bootstrap.Modal.getInstance(modal);
             if (modalInstance) {
                 modalInstance.hide();
             }
-            // Force a hard reload of the page
+            
             window.location.href = window.location.href;
         } else {
             showToast('Error', data.message, 'error');

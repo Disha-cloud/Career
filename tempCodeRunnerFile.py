@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from models import db, Student, CareerCounsellor, Administrator
 from werkzeug.security import check_password_hash
-from config import Config  # Import your Config class
+from config import Config  
 
 app = Flask(__name__)
-app.config.from_object(Config)  # Load configuration from Config class
+app.config.from_object(Config)  
 db.init_app(app)
 
 login_manager = LoginManager()

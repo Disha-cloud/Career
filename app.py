@@ -8,11 +8,11 @@ import logging
 import sys
 import os
 
-# Create logs directory if it doesn't exist
+
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
-# Configure root logger
+
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -22,10 +22,10 @@ logging.basicConfig(
     ]
 )
 
-# Create logger for this file
+
 logger = logging.getLogger(__name__)
 
-# Ensure all loggers show debug messages
+
 logging.getLogger('werkzeug').setLevel(logging.DEBUG)
 logging.getLogger('sqlalchemy').setLevel(logging.DEBUG)
 logging.getLogger('student_blueprint').setLevel(logging.DEBUG)
@@ -38,7 +38,7 @@ db.init_app(app)
 
 logger.debug("=== Starting Flask Application ===")
 
-# Register all blueprints
+
 logger.debug("Registering blueprints...")
 register_blueprints(app)
 app.register_blueprint(auth_bp)

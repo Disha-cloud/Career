@@ -266,10 +266,10 @@
 
 {% block content %}
 <div class="container py-4">
-    <!-- Header with Notifications -->
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Welcome, {{ student.first_name }}!</h1>
-        <!-- Notification Dropdown Component -->
+        
         <div class="dropdown">
             <button class="btn btn-light position-relative" type="button" id="notificationDropdown" 
                     data-bs-toggle="dropdown" aria-expanded="false">
@@ -288,7 +288,7 @@
                     </button>
                 </div>
                 <div id="notificationList" class="notification-list">
-                    <!-- Notifications will be loaded here -->
+                    
                 </div>
                 <div class="notification-footer">
                     <a href="{{ url_for('student.notifications') }}" class="text-muted">View all notifications</a>
@@ -297,11 +297,11 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
+    
     <div class="row">
-        <!-- Left Column -->
+        
         <div class="col-lg-8">
-            <!-- Career Goals Section -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Career Goals</h5>
@@ -310,7 +310,7 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <!-- Goal Statistics -->
+                    
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="stats-card">
@@ -331,7 +331,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Goals List Component -->
+                    
                     <div class="goal-list">
                         {% for goal in career_goals %}
                         <div class="goal-item" data-goal-id="{{ goal.goal_id }}">
@@ -355,7 +355,7 @@
                             </div>
                             {% endif %}
 
-                            <!-- Progress Section -->
+                            
                             <div class="goal-progress mb-3">
                                 {% set milestone_count = goal.milestones|length %}
                                 {% set completed_count = goal.milestones|selectattr('status', 'equalto', 'completed')|list|length %}
@@ -404,7 +404,7 @@
                                 </button>
                             </div>
 
-                            <!-- Milestone Preview -->
+                           
                             {% if goal.milestones %}
                             <div class="milestone-preview mt-3">
                                 <h6>Recent Milestones</h6>
@@ -447,7 +447,7 @@
                 </div>
             </div>
 
-            <!-- Assigned Tasks -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Assigned Tasks</h5>
@@ -500,7 +500,7 @@
                 </div>
             </div>
 
-            <!-- Upcoming Events -->
+            
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Upcoming Events</h5>
@@ -539,7 +539,7 @@
                 </div>
             </div>
 
-            <!-- Messages -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Messages</h5>
@@ -561,7 +561,7 @@
                     {% else %}
                     <div class="messages-container">
                         <div class="conversations-list">
-                            <!-- Conversations will be loaded here -->
+                            
                         </div>
                         <div class="chat-window" style="display: none;">
                             <div class="chat-header">
@@ -571,7 +571,7 @@
                                 <span class="chat-partner-name"></span>
                             </div>
                             <div class="chat-messages">
-                                <!-- Messages will be loaded here -->
+                                
                             </div>
                             <div class="chat-input">
                                 <form id="message-form" class="d-flex" onsubmit="return handleMessageSubmit(event)">
@@ -588,9 +588,9 @@
             </div>
         </div>
 
-        <!-- Right Column -->
+        
         <div class="col-lg-4">
-            <!-- Counsellor Info -->
+            
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Your Counsellor</h5>
@@ -606,7 +606,7 @@
                             <p><i class="fas fa-info-circle"></i> {{ student.counsellor.bio }}</p>
                         {% endif %}
                         
-                        <!-- Counsellor Schedule -->
+                        
                         <div class="schedule-section">
                             <h4><i class="fas fa-calendar-alt"></i> Weekly Schedule</h4>
                             {% if counsellor_schedule %}
@@ -626,7 +626,7 @@
                             {% endif %}
                         </div>
                         
-                        <!-- Contact Button -->
+                        
                        
                     </div>
                     {% else %}
@@ -635,7 +635,7 @@
                 </div>
             </div>
 
-            <!-- Appointments -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Appointments</h5>
@@ -644,7 +644,7 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <!-- Appointment Requests Section -->
+                    
                     <div class="mb-4">
                         <h6 class="mb-3">Pending Requests</h6>
                         {% if pending_requests %}
@@ -674,7 +674,7 @@
                         {% endif %}
                     </div>
 
-                    <!-- Confirmed Appointments Section -->
+                   
                     <div>
                         <h6 class="mb-3">Upcoming Appointments</h6>
                         <div class="appointments-list">
@@ -704,7 +704,7 @@
                 </div>
             </div>
 
-            <!-- Feedback Card -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Weekly Feedback</h5>
@@ -743,7 +743,7 @@
                 </div>
             </div>
 
-            <!-- Recent Grievances -->
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Recent Grievances</h5>
@@ -771,7 +771,7 @@
     </div>
 </div>
 
-<!-- Add Goal Modal -->
+
 <div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addGoalModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -809,7 +809,7 @@
     </div>
 </div>
 
-<!-- Edit Goal Modal -->
+
 <div class="modal fade" id="editGoalModal" tabindex="-1" aria-labelledby="editGoalModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -848,7 +848,7 @@
     </div>
 </div>
 
-<!-- Grievance Modal -->
+
 <div class="modal fade" id="grievanceModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -876,7 +876,7 @@
     </div>
 </div>
 
-<!-- Request Appointment Modal -->
+
 <div class="modal fade" id="requestAppointmentModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -932,7 +932,7 @@
     </div>
 </div>
 
-<!-- Weekly Feedback Modal -->
+
 <div class="modal fade" id="weeklyFeedbackModal" tabindex="-1" aria-labelledby="weeklyFeedbackModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -971,10 +971,10 @@
     </div>
 </div>
 
-<!-- Toast Container -->
+
 <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
-<!-- New Message Modal -->
+
 <div class="modal fade" id="newMessageModal" tabindex="-1" aria-labelledby="newMessageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1012,7 +1012,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     loadNotifications();
     
-    // Mark all as read button
+    
     document.getElementById('markAllReadBtn').addEventListener('click', function() {
         fetch('/student/notifications/mark-all-read', {
             method: 'POST',
@@ -1054,7 +1054,7 @@ function loadNotifications() {
                 </div>
             `).join('');
 
-            // Update badge
+            
             const badge = document.getElementById('notificationBadge');
             const unreadCount = data.notifications.filter(n => !n.read).length;
             badge.textContent = unreadCount;
@@ -1064,7 +1064,7 @@ function loadNotifications() {
 }
 
 function handleNotificationClick(notificationId, type, entityId) {
-    // Mark as read
+    
     fetch(`/student/notifications/${notificationId}/read`, {
         method: 'POST',
         headers: {
@@ -1076,7 +1076,7 @@ function handleNotificationClick(notificationId, type, entityId) {
         if (data.success) {
             loadNotifications();
             
-            // Navigate based on notification type
+            
             switch (type) {
                 case 'appointment':
                     window.location.href = `/student/appointments/${entityId}`;
@@ -1091,7 +1091,7 @@ function handleNotificationClick(notificationId, type, entityId) {
                     window.location.href = `/student/payments/${entityId}`;
                     break;
                 default:
-                    // For general notifications, just mark as read
+                    
                     break;
             }
         }
@@ -1115,7 +1115,7 @@ function formatDate(dateString) {
     const now = new Date();
     const diff = now - date;
     
-    // Less than 24 hours
+   
     if (diff < 24 * 60 * 60 * 1000) {
         const hours = Math.floor(diff / (60 * 60 * 1000));
         if (hours < 1) {
@@ -1125,13 +1125,13 @@ function formatDate(dateString) {
         return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
     }
     
-    // Less than 7 days
+    
     if (diff < 7 * 24 * 60 * 60 * 1000) {
         const days = Math.floor(diff / (24 * 60 * 60 * 1000));
         return `${days} day${days !== 1 ? 's' : ''} ago`;
     }
     
-    // More than 7 days
+    
     return date.toLocaleDateString();
 }
 
@@ -1143,7 +1143,7 @@ function submitAppointmentRequest(event) {
     const submitBtn = form.querySelector('button[type="submit"]');
     const modal = document.getElementById('requestAppointmentModal');
     
-    // Disable submit button
+    
     submitBtn.disabled = true;
     
     fetch("{{ url_for('student.request_appointment') }}", {
@@ -1154,11 +1154,11 @@ function submitAppointmentRequest(event) {
     .then(data => {
         if (data.status === 'success') {
             showToast(data.message, 'success');
-            // Close modal and reset form
+            
             const modalInstance = bootstrap.Modal.getInstance(modal);
             modalInstance.hide();
             form.reset();
-            // Reload page after a short delay
+            
             setTimeout(() => {
                 window.location.reload();
             }, 2000);
@@ -1201,7 +1201,7 @@ function showToast(message, type = 'success') {
     });
     bsToast.show();
 
-    // Remove the toast after it's hidden
+    
     toast.addEventListener('hidden.bs.toast', () => {
         toast.remove();
     });
@@ -1228,7 +1228,7 @@ function loadConversations() {
                 </div>
             `).join('');
 
-            // Add click handlers
+            
             document.querySelectorAll('.conversation-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const id = item.dataset.id;
@@ -1257,7 +1257,7 @@ function loadMessages(partnerId, partnerType) {
             chatMessages.innerHTML = messages.map(msg => {
                 const isSentByMe = msg.sender_type === 'student' && msg.sender_id === currentUserId;
                 const messageDate = new Date(msg.sent_at);
-                // Convert to IST by adding 5 hours and 30 minutes
+                
                 messageDate.setHours(messageDate.getHours() + 5);
                 messageDate.setMinutes(messageDate.getMinutes() + 30);
                 const timeString = messageDate.toLocaleTimeString('en-US', { 
@@ -1278,8 +1278,7 @@ function loadMessages(partnerId, partnerType) {
         `;
             }).join('');
             
-            // If we're already at the bottom, scroll to the new bottom
-            // Or if this is a new message (scrollHeight increased), scroll to bottom
+            
             const wasAtBottom = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 10;
             if (wasAtBottom) {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1320,13 +1319,13 @@ document.getElementById('message-form').addEventListener('submit', (e) => {
     });
 });
 
-// Load conversations initially
+
 loadConversations();
 
-// Refresh conversations every 30 seconds
+
 setInterval(loadConversations, 30000);
 
-// New message functionality
+
 document.getElementById('send-new-message').addEventListener('click', function() {
     var messageText = document.getElementById('new-message-text').value.trim();
     if (!messageText) return;
@@ -1362,25 +1361,25 @@ document.getElementById('send-new-message').addEventListener('click', function()
     });
 });
 
-// Add event listener to start time input
+
 document.querySelector('input[name="start_time"]').addEventListener('change', function() {
     const startTime = this.value;
     if (startTime) {
-        // Parse the start time and add 1 hour
+        
         const [hours, minutes] = startTime.split(':');
         const date = new Date();
         date.setHours(parseInt(hours));
         date.setMinutes(parseInt(minutes));
         date.setHours(date.getHours() + 1);
         
-        // Format the end time
+       
         const endHours = String(date.getHours()).padStart(2, '0');
         const endMinutes = String(date.getMinutes()).padStart(2, '0');
         document.querySelector('input[name="end_time"]').value = `${endHours}:${endMinutes}`;
     }
 });
 
-// Event Registration Function
+
 function registerForEvent(eventId) {
     const button = document.querySelector(`[data-event-id="${eventId}"] button`);
     if (button) {
@@ -1404,7 +1403,7 @@ function registerForEvent(eventId) {
             }
         } else {
             showToast('Successfully registered for the event!', 'success');
-            // Update the UI to show registered status
+            
             const eventItem = document.querySelector(`[data-event-id="${eventId}"] .event-actions`);
             if (eventItem) {
                 eventItem.innerHTML = '<span class="badge bg-success">Registered</span>';
@@ -1421,7 +1420,7 @@ function registerForEvent(eventId) {
     });
 }
 
-// Add toast container if it doesn't exist
+
 if (!document.getElementById('toastContainer')) {
     const toastContainer = document.createElement('div');
     toastContainer.id = 'toastContainer';
@@ -1458,12 +1457,12 @@ function checkWeeklyFeedback() {
         .catch(error => console.error('Error checking feedback status:', error));
 }
 
-// Call this when the page loads
+
 document.addEventListener('DOMContentLoaded', function() {
     checkWeeklyFeedback();
 });
 
-// Update the submitWeeklyFeedback function
+
 function submitWeeklyFeedback(event) {
     event.preventDefault();
     const form = event.target;
@@ -1476,17 +1475,17 @@ function submitWeeklyFeedback(event) {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            // Close the modal
+            
             const modal = bootstrap.Modal.getInstance(document.getElementById('weeklyFeedbackModal'));
             modal.hide();
             
-            // Show success message
+            
             showToast('Success', data.message, 'success');
             
-            // Refresh feedback status
+            
             checkWeeklyFeedback();
             
-            // Reset form
+            
             form.reset();
         } else {
             showToast('Error', data.message, 'error');
@@ -1498,7 +1497,7 @@ function submitWeeklyFeedback(event) {
     });
 }
 
-// Task Management Functions
+
 function updatePendingTasksCount() {
     const pendingTasks = document.querySelectorAll('.task-item:not(.completed)').length;
     const badge = document.getElementById('pendingTasksCount');
@@ -1524,21 +1523,21 @@ function markTaskComplete(taskId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Find and update the task item
+           
             const taskItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
             if (taskItem) {
-                // Update status badge
+                
                 const statusBadge = taskItem.querySelector('.badge');
                 if (statusBadge) {
                     statusBadge.className = 'badge bg-success';
                     statusBadge.textContent = 'Completed';
                 }
-                // Remove complete button
+                
                 const actionButton = taskItem.querySelector('.task-actions');
                 if (actionButton) {
                     actionButton.remove();
                 }
-                // Show success message
+                
                 showToast('Task marked as completed successfully', 'success');
             }
         } else {
@@ -1559,9 +1558,9 @@ function markTaskComplete(taskId) {
     });
 }
 
-// Call this when page loads
+
 document.addEventListener('DOMContentLoaded', function() {
-    // ... existing DOMContentLoaded handlers ...
+    
     updatePendingTasksCount();
 });
 
@@ -1594,11 +1593,11 @@ function handleMessageSubmit(event) {
         if (data.error) {
             showToast(data.error, 'danger');
         } else {
-            // Add message to chat immediately
+           
             addMessageToChat(message, timestamp, true);
             messageInput.value = '';
             
-            // Refresh messages
+            
             if (currentConversation) {
                 loadMessages(currentConversation.id, currentConversation.type);
             }
@@ -1626,7 +1625,7 @@ function addMessageToChat(message, timestamp, isSent) {
 
 function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
-    // Convert to IST by adding 5 hours and 30 minutes
+    
     date.setHours(date.getHours() + 5);
     date.setMinutes(date.getMinutes() + 30);
     return date.toLocaleTimeString('en-US', { 
@@ -1645,7 +1644,7 @@ function cancelAppointmentRequest(requestId) {
         .then(data => {
             if (data.status === 'success') {
                 showToast(data.message, 'success');
-                // Reload page after a short delay
+                
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
@@ -1660,7 +1659,7 @@ function cancelAppointmentRequest(requestId) {
     }
 }
 
-// Function to check for new messages
+
 function checkNewMessages() {
     if (currentConversation) {
         const lastMessage = document.querySelector('.chat-messages .message:last-child');
@@ -1677,13 +1676,13 @@ function checkNewMessages() {
     }
 }
 
-// Function to play message notification sound
+
 function playMessageSound() {
     const audio = new Audio('/static/sounds/message.mp3');
     audio.play().catch(e => console.log('Audio play failed:', e));
 }
 
-// Check for new messages every 5 seconds
+
 setInterval(checkNewMessages, 5000);
 </script>
 {% endblock %} 

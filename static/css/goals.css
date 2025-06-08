@@ -1,4 +1,4 @@
-/* Goal and Milestone Styles */
+
 .goal-list {
     max-width: 1200px;
     margin: 0 auto;
@@ -141,12 +141,12 @@
     border-radius: 12px;
 }
 
-/* Empty state styling */
+
 .text-center i {
     color: #dee2e6;
 }
 
-/* Statistics Cards */
+
 .card {
     border: none;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -182,7 +182,7 @@
     min-width: 250px;
 }
 
-/* Modal Styling */
+
 .modal-content {
     border: none;
     border-radius: 12px;
@@ -202,7 +202,7 @@
     padding: 1.5rem;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .goal-header {
         flex-direction: column;

@@ -78,7 +78,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            flex-shrink: 0;  /* Prevent header from shrinking */
+            flex-shrink: 0;  
         }
 
         .scrollable-content {
@@ -207,7 +207,7 @@
             padding-top: 1rem;
         }
 
-        /* Make cards responsive on smaller screens */
+        
         @media (max-width: 1200px) {
             .admin-stats {
                 grid-template-columns: repeat(2, 1fr);
@@ -229,17 +229,17 @@
             }
         }
 
-        /* Ensure content fills height in dashboard cards */
+        
         .dashboard-card > :last-child {
             margin-top: auto;
         }
 
-        /* Add some spacing between header and content */
+        
         .admin-header {
             margin-bottom: 2rem;
         }
 
-        /* Custom styles for the remove registration button */
+        
         .btn-remove-registration {
             padding: 0.25rem 0.5rem;
             font-size: 0.75rem;
@@ -570,7 +570,7 @@
                         <small>{{ event.event_date.strftime('%B %d, %Y') }} at {{ event.start_time.strftime('%I:%M %p') }}</small>
                         <span class="status">{{ event.event_type|title }}</span>
                         
-                        <!-- Add Delete Button -->
+                        
                         <form action="{{ url_for('admin.delete_event', event_id=event.event_id) }}" 
                               method="POST" 
                               style="display: inline; float: right;"
@@ -580,7 +580,7 @@
                             </button>
                         </form>
                         
-                        <!-- Registered Users Section -->
+                        
                         <div class="registered-users mt-2">
                             <small class="text-muted">Registered Users:</small>
                             {% if event.registrations %}
@@ -693,7 +693,7 @@
     </div>
 
     <script>
-        // Search functionality
+        
         document.getElementById('userSearch').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const userItems = document.querySelectorAll('.user-item');
@@ -704,7 +704,7 @@
             });
         });
 
-        // Remove event registration
+        
         async function removeRegistration(eventId, studentId) {
             if (!confirm('Are you sure you want to remove this user from the event?')) {
                 return;
@@ -721,13 +721,13 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Remove the user element from the DOM
+                    
                     const userElement = document.querySelector(`.registered-user[data-student-id="${studentId}"][data-event-id="${eventId}"]`);
                     if (userElement) {
                         userElement.remove();
                     }
                     
-                    // Reload the page to update the registration count
+                    
                     window.location.reload();
                 } else {
                     alert(data.message || 'Failed to remove registration');
@@ -836,7 +836,7 @@
             }
         }
 
-        // Add this new function for handling counsellor reassignment
+        
         document.querySelectorAll('.reassign-counsellor-form').forEach(form => {
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();

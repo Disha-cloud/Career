@@ -10,7 +10,7 @@ db = SQLAlchemy()
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Check if request is JSON
+        
         if request.is_json:
             data = request.get_json()
             email = data.get('email', '').strip()
@@ -19,7 +19,7 @@ def login():
             email = request.form.get('email', '').strip()
             password = request.form.get('password', '')
 
-        # Check if it's the admin email
+        
         if Administrator.is_admin_email(email):
             user = Administrator.query.filter_by(email=email).first()
             if user and user.check_password(password):
@@ -35,7 +35,7 @@ def login():
                 flash('Invalid admin credentials.', 'danger')
                 return render_template('auth/login.html')
 
-        # Try to find user in student or counsellor tables
+        
         user = Student.query.filter_by(email=email).first()
         user_type = 'student'
         
@@ -51,7 +51,7 @@ def login():
             if request.is_json:
                 return jsonify({'success': False, 'message': 'Incorrect password.'}), 401
             flash('Incorrect password.', 'danger')
-        elif not user.is_active:  # Check if user is active
+        elif not user.is_active:  
             if request.is_json:
                 return jsonify({'success': False, 'message': 'Your account has been deactivated. Please contact the administrator.'}), 401
             flash('Your account has been deactivated. Please contact the administrator.', 'danger')

@@ -27,7 +27,7 @@ def initialize_counsellors():
 def init_db():
     db.create_all()
     
-    # Create admin account if it doesn't exist
+   
     admin_email = Administrator.ADMIN_EMAIL
     if not Administrator.query.filter_by(email=admin_email).first():
         admin = Administrator(
@@ -35,7 +35,7 @@ def init_db():
             first_name='Admin',
             last_name='User'
         )
-        admin.set_password('admin123')  # Default password, should be changed after first login
+        admin.set_password('admin123')  
         db.session.add(admin)
         db.session.commit()
         print("Admin account created successfully!")

@@ -157,12 +157,12 @@
     </div>
 
     <script>
-        // Set minimum date to today
+        
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('event_date').min = today;
         console.log('[DEBUG] Set minimum date to:', today);
 
-        // Debug form values before submission
+        
         function debugFormValues() {
             const form = document.querySelector('form');
             const formData = new FormData(form);
@@ -172,7 +172,7 @@
             }
         }
 
-        // Validate end time is after start time
+        
         document.querySelector('form').addEventListener('submit', function(e) {
             console.log('[DEBUG] Form submission started');
             debugFormValues();
@@ -192,7 +192,7 @@
             }
         });
 
-        // Add debug logging for form field changes
+        
         const formFields = document.querySelectorAll('input, textarea, select');
         formFields.forEach(field => {
             field.addEventListener('change', function(e) {

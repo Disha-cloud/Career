@@ -20,7 +20,7 @@
         </button>
     </div>
 
-    <!-- Goals Statistics -->
+    
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card">
@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    <!-- Goals List -->
+    
     <div class="goals-container">
         {% for goal in career_goals %}
         <div class="goal-item" data-goal-id="{{ goal.goal_id }}">
@@ -114,7 +114,7 @@
         {% endfor %}
     </div>
 
-    <!-- Add Goal Modal -->
+    
     <div class="modal fade" id="addGoalModal" tabindex="-1" aria-labelledby="addGoalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -152,7 +152,7 @@
         </div>
     </div>
 
-    <!-- Edit Goal Modal -->
+    
     <div class="modal fade" id="editGoalModal" tabindex="-1" aria-labelledby="editGoalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -191,7 +191,7 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
+   
     <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 </div>
 {% endblock %}

@@ -1,6 +1,4 @@
-/* Luxurious Pinterest-style CSS for CareerConnect */
 
-/* Global Styles & Reset */
 * {
     margin: 0;
     padding: 0;
@@ -9,10 +7,10 @@
   }
   
   :root {
-    --primary-color: #2e2a5d; /* Deep Royal Purple */
-    --secondary-color: #3f3a72; /* Rich Indigo */
-    --accent-color: #9473e6; /* Lavender Accents */
-    --background-color: #f4f4fb; /* Light Misty Background */
+    --primary-color: #2e2a5d; 
+    --secondary-color: #3f3a72; 
+    --accent-color: #9473e6; 
+    --background-color: #f4f4fb; 
     --dark-text: #1f1e2e;
     --medium-text: #3e3b5b;
     --light-text: #6b6b91;
@@ -40,7 +38,7 @@
     margin: auto;
   }
   
-  /* Navbar */
+  
   .navbar {
     background-color: white;
     width: 100%;
@@ -83,7 +81,7 @@
     background-color: var(--accent-color);
   }
   
-  /* Main Content */
+  
   main {
     padding: 2rem 0;
     display: flex;
@@ -95,7 +93,7 @@
     width: 100%;
   }
   
-  /* Registration Form */
+  
   .register-container {
     background-color: white;
     border-radius: var(--radius-lg);
@@ -172,7 +170,7 @@
     color: var(--accent-color);
   }
   
-  /* Footer */
+  
   footer {
     background-color: var(--primary-color);
     padding: 2rem 0;
@@ -191,7 +189,7 @@
     color: #fff;
   }
   
-  /* Responsive Design */
+  
   @media (max-width: 768px) {
     .navbar {
       flex-direction: column;
@@ -223,7 +221,7 @@
       padding: 0.7rem;
     }
   }
-  /* Appointments Section */
+  
 .appointments-section {
   background-color: var(--background-color);
   padding: 3rem 0;
@@ -293,7 +291,7 @@
 .cancel-btn:hover {
   background-color: var(--accent-color);
 }
-/* Feedback Section */
+
 .feedback-section {
   background-color: var(--background-color);
   padding: 3rem 0;

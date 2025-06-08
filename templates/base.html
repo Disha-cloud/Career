@@ -20,7 +20,7 @@
         <nav>
             {% block navigation %}
             {% if current_user.is_authenticated %}
-            <!-- Notification Dropdown -->
+            
             <div class="dropdown">
                 <button class="btn btn-light position-relative" type="button" id="notificationDropdown" 
                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -39,7 +39,7 @@
                         </button>
                     </div>
                     <div id="notificationList" class="notification-list">
-                        <!-- Notifications will be loaded here -->
+                        
                     </div>
                     <div class="notification-footer">
                         <a href="{{ url_for('student.notifications') }}" class="text-muted">View all notifications</a>

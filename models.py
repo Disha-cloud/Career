@@ -271,7 +271,7 @@ class Event(db.Model):
     is_online = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Add relationship to EventRegistration with student information
+   
     registrations = db.relationship('EventRegistration',
                                   backref=db.backref('event', lazy=True),
                                   lazy='joined',
@@ -286,7 +286,7 @@ class EventRegistration(db.Model):
     reminder_sent = db.Column(db.Boolean, default=False)
     attendance_status = db.Column(db.Enum('registered', 'attended', 'missed'), default='registered')
     
-    # Add relationship to Student to get student information
+    
     student = db.relationship('Student', backref=db.backref('event_registrations', lazy=True))
 
 class Task(db.Model):
@@ -296,9 +296,9 @@ class Task(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     due_date = db.Column(db.Date)
-    priority = db.Column(db.String(20), nullable=False)  # High, Medium, Low
-    category = db.Column(db.String(50), nullable=False)  # Career, Academic, Personal, Other
-    status = db.Column(db.String(20), nullable=False, default='Pending')  # Pending, Completed
+    priority = db.Column(db.String(20), nullable=False) 
+    category = db.Column(db.String(50), nullable=False)  
+    status = db.Column(db.String(20), nullable=False, default='Pending')  
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -331,7 +331,7 @@ class AppointmentRequest(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationships
+   
     student = db.relationship('Student', backref=db.backref('appointment_requests', lazy=True))
     counsellor = db.relationship('CareerCounsellor', backref=db.backref('appointment_requests', lazy=True))
 

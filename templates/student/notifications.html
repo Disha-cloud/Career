@@ -37,7 +37,7 @@
             {% endfor %}
         </div>
 
-        <!-- Pagination -->
+        
         {% if notifications.pages > 1 %}
             <nav aria-label="Notification pages" class="mt-4">
                 <ul class="pagination justify-content-center">
@@ -80,7 +80,7 @@
     {% endif %}
 </div>
 
-<!-- JavaScript for marking notifications as read -->
+
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -99,12 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Remove the info background and the mark as read button
+                    
                     const notificationItem = this.closest('.list-group-item');
                     notificationItem.classList.remove('list-group-item-info');
                     this.remove();
                     
-                    // Update unread count in navbar if it exists
+                    
                     const unreadBadge = document.querySelector('#unreadNotificationCount');
                     if (unreadBadge) {
                         const currentCount = parseInt(unreadBadge.textContent);
